@@ -544,27 +544,25 @@ class VentasView:
             exportar_ventas_xlsx(ruta, headers, filas)
             messagebox.showinfo("Exito", f"Ventas exportadas en:\n{ruta}", parent=modal)
 
-        def buscar_por_cedula():
+        ventas_completas = self.controller.model.obtener_historial_ventas()
+
+        def _filtrar_por_cedula(event=None):
             cedula = entry_cedula.get().strip()
-            if not cedula:
-                messagebox.showwarning("Aviso", "Ingrese una cedula para buscar.", parent=modal)
-                return
-            cliente = self.controller.model.buscar_cliente_por_cedula(cedula)
-            if not cliente:
-                messagebox.showinfo("Sin resultados", "No existe un cliente con esa cedula.", parent=modal)
-                return
-            ventas = self.controller.model.obtener_historial_por_cliente(cliente["id_cliente"])
-            _poblar(tree, ventas)
-            lbl_consulta.configure(text=f"Cliente: {cliente['nombre']}")
+            if cedula:
+                filtradas = [v for v in ventas_completas if str(v.get("cedula", "")).startswith(cedula)]
+                nombres = {v["cliente"] for v in filtradas}
+                lbl_consulta.configure(text=f"Cliente: {', '.join(sorted(nombres))}" if nombres else "Sin resultados")
+            else:
+                filtradas = ventas_completas
+                lbl_consulta.configure(text="")
+            _poblar(tree, filtradas)
+
+        entry_cedula.bind("<KeyRelease>", _filtrar_por_cedula)
 
         def ver_todos():
-            ventas = self.controller.model.obtener_historial_ventas()
-            _poblar(tree, ventas)
-            lbl_consulta.configure(text="")
+            entry_cedula.delete(0, "end")
+            _filtrar_por_cedula()
 
-        ctk.CTkButton(search_row, text="Buscar", fg_color="#5CB85C", text_color="#000000",
-                      font=("Arial", 10, "bold"), width=70, height=28, corner_radius=6,
-                      command=buscar_por_cedula).pack(side="left", padx=5)
         ctk.CTkButton(search_row, text="Ver Todos", fg_color="#5CB85C", text_color="#000000",
                       font=("Arial", 10, "bold"), width=90, height=28, corner_radius=6,
                       command=ver_todos).pack(side="left", padx=5)
@@ -582,7 +580,7 @@ class VentasView:
             tree.column(col, width=w, anchor="center")
         tree.pack(fill="both", expand=True)
 
-        _poblar(tree, self.controller.model.obtener_historial_ventas())
+        _poblar(tree, ventas_completas)
 
         def ver_detalles():
             seleccion = tree.selection()

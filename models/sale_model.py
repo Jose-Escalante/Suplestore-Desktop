@@ -80,7 +80,7 @@ class SaleModel:
         query = """
             SELECT n.numero_nota AS id_venta,
                    CONCAT(LPAD(n.secuencia, 4, '0'), '-', RIGHT(n.anio, 2)) AS numero_control,
-                   c.nombre AS cliente, u.usuario AS vendedor,
+                   c.nombre AS cliente, c.cedula, u.usuario AS vendedor,
                    n.metodo_pago, n.monto_total AS total, n.descuento, n.monto_cancelado, n.fecha_hora AS fecha
             FROM notas_entrega n
             JOIN clientes c ON n.id_cliente = c.id_cliente
@@ -94,7 +94,7 @@ class SaleModel:
         query = """
             SELECT n.numero_nota AS id_venta,
                    CONCAT(LPAD(n.secuencia, 4, '0'), '-', RIGHT(n.anio, 2)) AS numero_control,
-                   c.nombre AS cliente, u.usuario AS vendedor,
+                   c.nombre AS cliente, c.cedula, u.usuario AS vendedor,
                    n.metodo_pago, n.monto_total AS total, n.descuento, n.monto_cancelado, n.fecha_hora AS fecha
             FROM notas_entrega n
             JOIN clientes c ON n.id_cliente = c.id_cliente
