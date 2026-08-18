@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox, ttk
+from services.ui_utils import traer_al_frente
 
 
 class CategoriasView:
@@ -47,6 +48,7 @@ class CategoriasView:
 
     def abrir_modal_agregar(self):
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title("Registrar Nueva Categoria")
         modal.geometry("350x230")

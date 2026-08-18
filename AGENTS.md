@@ -3,31 +3,41 @@
 ## Arquitectura: MVC (Modelo-Vista-Controlador)
 
 ```
-Prueba app/
+Suplestore Desktop/
 ├── main.py                           # Punto de entrada
 ├── AGENTS.md                         # Esta guía
 ├── opencode.json                     # Configuración del agente
 ├── requirements.txt                  # Dependencias del proyecto
 ├── README.md                         # Documentación general
+├── suplestore_db_full.sql            # Script de inicialización de BD (dump)
+├── .env                              # Credenciales de BD (no se sube a git)
+├── .gitignore
 ├── models/                           # CAPA MODELO (SRP)
 │   ├── __init__.py                   # Exporta todos los modelos
-│   ├── connection.py                 # DatabaseConnection (conexión MySQL)
+│   ├── connection.py                 # DatabaseConnection (conexión MySQL, lee .env)
 │   ├── database_model.py             # FACADE: unifica los sub-modelos
-│   ├── user_model.py                 # UserModel: usuarios y permisos
+│   ├── user_model.py                 # UserModel: usuarios, permisos, login y seguridad
 │   ├── client_model.py               # ClientModel: clientes CRUD
 │   ├── category_model.py             # CategoryModel: categorías CRUD
 │   ├── product_model.py              # ProductModel: productos y lotes
-│   └── sale_model.py                 # SaleModel: ventas y notas
+│   ├── sale_model.py                 # SaleModel: ventas, notas y descuentos
+│   ├── event_model.py                # EventModel: bitácora de eventos
+│   └── backup_model.py               # BackupModel: exportar/importar respaldos SQL
 ├── controllers/
 │   └── app_controller.py             # CAPA CONTROLADOR: estado, navegación, permisos
+├── services/
+│   ├── nota_entrega.py               # Generación de notas de entrega en PDF
+│   └── excel_export.py               # Exportación de ventas a Excel (.xlsx)
 └── views/
     ├── login_view.py                 # CAPA VISTA: login
-    ├── panel_view.py                 # CAPA VISTA: panel de control
+    ├── cambio_password_view.py       # CAPA VISTA: cambio de contraseña obligatorio
+    ├── panel_view.py                 # CAPA VISTA: panel de control (+ modal respaldo)
     ├── categorias_view.py            # CAPA VISTA: CRUD categorías
-    ├── usuarios_view.py              # CAPA VISTA: CRUD usuarios
+    ├── usuarios_view.py              # CAPA VISTA: CRUD usuarios + reset de contraseña
     ├── clientes_view.py              # CAPA VISTA: CRUD clientes
-    ├── ventas_view.py                # CAPA VISTA: módulo de ventas + carrito
-    └── inventario_view.py            # CAPA VISTA: inventario y lotes
+    ├── ventas_view.py                # CAPA VISTA: módulo de ventas + carrito + historial notas
+    ├── inventario_view.py            # CAPA VISTA: inventario y lotes
+    └── historial_view.py             # CAPA VISTA: historial de eventos (bitácora)
 ```
 
 ## Principios SOLID aplicados
@@ -42,7 +52,9 @@ Cada modelo tiene **una única responsabilidad**:
 | `ClientModel` | `client_model.py` | Clientes (CRUD) |
 | `CategoryModel` | `category_model.py` | Categorías (CRUD) |
 | `ProductModel` | `product_model.py` | Productos, lotes e inventario |
-| `SaleModel` | `sale_model.py` | Notas de entrega y ventas |
+| `SaleModel` | `sale_model.py` | Notas de entrega, ventas y descuentos |
+| `EventModel` | `event_model.py` | Bitácora de eventos |
+| `BackupModel` | `backup_model.py` | Exportar/importar respaldos SQL |
 | `DatabaseModel` | `database_model.py` | Fachada (delega a los modelos SRP) |
 
 **Regla:** Si necesitas modificar la lógica de clientes, solo tocas `client_model.py`. Nunca mezcles responsabilidades.
@@ -103,9 +115,23 @@ controller.show_usuarios()
 controller.show_clientes()
 controller.show_ventas()
 controller.show_inventario()
+controller.show_historial()
 ```
 
-### 6. Convenciones de código
+### 6. Seguridad y contraseñas
+- Las contraseñas se guardan con **bcrypt**; en BD solo hay hashes, nunca texto plano.
+- `user_model.intentar_login(usuario, clave)` devuelve un dict: `{"estado": "ok"|"incorrecta"|"bloqueado", ...}`. Constantes `MAX_INTENTOS = 5` y `MINUTOS_BLOQUEO = 5`; en `bloqueado` incluye `minutos`/`restantes` para el mensaje.
+- `user_model.validar_complejidad(clave)` exige mínimo 8 caracteres, mayúscula, minúscula, número y símbolo. Aplicarla al crear/actualizar/resetear usuarios y en el cambio forzado de contraseña.
+- `cambio_obligatorio` en `usuarios` fuerza el cambio de contraseña en el próximo login.
+- `user_model.resetear_contrasena` (exigido por el admin con su clave) deja una clave temporal y activa `cambio_obligatorio`.
+
+### 7. Bitácora de eventos
+- `EventModel` registra eventos en la tabla `eventos`; el controller expone `self.controller.registrar_evento(tipo, detalle)`.
+- Registrar eventos en: login, logout, venta confirmada, cambio/reset de contraseña, respaldo exportado/importado.
+- `modulo_historial` (TINYINT) en `permisos_usuario` controla el acceso a `show_historial()`.
+- La tabla `eventos` tiene `fk_eventos_usuario ON DELETE SET NULL` para poder eliminar usuarios aunque tengan eventos.
+
+### 8. Convenciones de código
 - **Sin comentarios** en el código
 - Nombres de métodos/variables en `snake_case`
 - Nombres de clases en `PascalCase`
@@ -113,19 +139,19 @@ controller.show_inventario()
 - Layout: `top_bar` verde con título, `container` gris oscuro, `sidebar` a la derecha con botones, tabla a la izquierda
 - Imports ordenados: estándar → terceros → locales
 
-### 7. Base de datos
+### 9. Base de datos
 - Motor: MySQL (`mysql.connector`)
-- Host: `localhost`, User: `root`, Password: `admin`, DB: `suplestore_db`
+- Las credenciales de conexión (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) se leen **únicamente** del archivo `.env`; sin `.env` la app muestra un error de conexión
 - La conexión se hace en `DatabaseConnection.__init__()` (`models/connection.py`)
 - Todas las consultas usan `cursor(dictionary=True)` para devolver dicts
 - `commit()` y `rollback()` van por `self.db.commit()` / `self.db.rollback()`
 
-### 8. Permisos
+### 10. Permisos
 - Cada módulo tiene permiso booleano en `permisos_usuario`
 - El controller expone `verificar_permiso(modulo)` y `verificar_permiso_o_rechazar(modulo)`
 - Las vistas de módulos verifican permiso antes de construirse (el controller lo hace automáticamente en `show_*`)
 
-### 9. Cómo agregar un nuevo módulo
+### 11. Cómo agregar un nuevo módulo
 
 #### Si el módulo necesita nuevos datos en BD:
 1. Crear `models/mi_modulo_model.py` con una clase que reciba `db: DatabaseConnection`
@@ -141,7 +167,7 @@ controller.show_inventario()
    - Importar la vista
    - Agregar método `show_mi_modulo()` con verificación de permiso
 
-### 10. Ejecución
+### 12. Ejecución
 ```bash
 pip install -r requirements.txt
 python main.py

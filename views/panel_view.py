@@ -3,6 +3,7 @@ import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from datetime import datetime
 from PIL import Image
+from services.ui_utils import traer_al_frente
 
 
 class PanelView:
@@ -87,6 +88,7 @@ class PanelView:
 
     def abrir_modal_respaldo(self):
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title("Copias de Seguridad")
         modal.geometry("400x220")

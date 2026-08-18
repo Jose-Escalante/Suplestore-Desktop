@@ -4,6 +4,7 @@ from tkinter import messagebox, ttk
 from PIL import Image
 
 from models.user_model import validar_complejidad
+from services.ui_utils import traer_al_frente
 
 
 class UsuariosView:
@@ -86,6 +87,7 @@ class UsuariosView:
 
     def abrir_modal_agregar(self):
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title("Registrar Nuevo Usuario")
         modal.geometry("400x520")
@@ -172,6 +174,7 @@ class UsuariosView:
         permisos_actuales = self.controller.model.obtener_permisos_usuario(id_usuario)
 
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title("Actualizar Usuario")
         modal.geometry("400x520")
@@ -273,6 +276,7 @@ class UsuariosView:
             return
 
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title("Resetear Contrasena")
         modal.geometry("380x300")

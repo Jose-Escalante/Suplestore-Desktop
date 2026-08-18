@@ -3,6 +3,7 @@ import customtkinter as ctk
 from tkinter import messagebox, ttk
 from datetime import datetime
 from PIL import Image
+from services.ui_utils import traer_al_frente
 
 
 class InventarioView:
@@ -148,6 +149,7 @@ class InventarioView:
 
     def abrir_modal_registrar_producto(self):
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title("Registrar Producto y Lote Inicial")
         modal.geometry("460x520")
@@ -295,6 +297,7 @@ class InventarioView:
         cat_dict = {c["nombre_categoria"]: c["id_categoria"] for c in categorias}
 
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title(f"Editar Producto")
         modal.geometry("380x280")
@@ -347,6 +350,7 @@ class InventarioView:
             return
 
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title(f"Agregar Lote a: {prod['Producto']}")
         modal.geometry("460x420")
@@ -466,6 +470,7 @@ class InventarioView:
             return
 
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title(f"Lotes - {prod['Producto']}")
         modal.geometry("600x400")
@@ -509,6 +514,7 @@ class InventarioView:
         lote = {"id_lote": vals[0], "stock": vals[1], "costo": vals[2], "precio": vals[3], "vencimiento": vals[4]}
 
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title(f"Editar Lote #{lote['id_lote']}")
         modal.geometry("460x420")
@@ -625,6 +631,7 @@ class InventarioView:
             return
 
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title(f"Historial de Lotes - {prod['Producto']}")
         modal.geometry("600x350")

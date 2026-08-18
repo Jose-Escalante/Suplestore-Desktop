@@ -5,6 +5,7 @@ from PIL import Image
 from datetime import datetime
 from services.nota_entrega import generar_nota_entrega
 from services.excel_export import exportar_ventas_xlsx
+from services.ui_utils import traer_al_frente
 
 
 class VentasView:
@@ -267,6 +268,7 @@ class VentasView:
         item_actual = self.carrito_items[index]
 
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title("Editar Cantidad")
         modal.geometry("300x160")
@@ -339,6 +341,7 @@ class VentasView:
         base = item_actual["cantidad"] * item_actual["precio"]
 
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title("Descuento por Producto")
         modal.geometry("320x240")
@@ -389,6 +392,7 @@ class VentasView:
             return
 
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title("Procesar Pago y Nota de Entrega")
         modal.geometry("380x360")
@@ -497,6 +501,7 @@ class VentasView:
 
     def abrir_modal_historial(self):
         modal = ctk.CTkToplevel(self.root)
+        traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title("Historial de Notas de Entrega")
         modal.geometry("860x520")
@@ -587,6 +592,7 @@ class VentasView:
             id_nota = int(seleccion[0])
 
             modal_det = ctk.CTkToplevel(modal)
+            traer_al_frente(modal_det)
             modal_det.resizable(False, False)
             modal_det.title(f"Detalles de Nota {id_nota}")
             modal_det.geometry("550x300")
@@ -686,15 +692,16 @@ class VentasView:
             messagebox.showinfo("Exito", f"Nota de entrega descargada en:\n{ruta_pdf}", parent=modal)
 
         btn_row = ctk.CTkFrame(modal, fg_color="#333333")
-        btn_row.pack(fill="x", padx=15, pady=(0, 5))
+        btn_row.pack(fill="x", padx=15, pady=(0, 8))
+        btn_row.grid_columnconfigure((0, 1, 2, 3), weight=1, uniform="btn_acciones")
         ctk.CTkButton(btn_row, text="Ver Detalles de Nota", fg_color="#5CB85C", text_color="#000000",
-                      font=("Arial", 10, "bold"), command=ver_detalles).pack(side="left", padx=5)
+                      font=("Arial", 10, "bold"), command=ver_detalles).grid(row=0, column=0, sticky="ew", padx=5)
         ctk.CTkButton(btn_row, text="Reimprimir", fg_color="#5CB85C", text_color="#000000",
-                      font=("Arial", 10, "bold"), command=reimprimir).pack(side="left", padx=5)
+                      font=("Arial", 10, "bold"), command=reimprimir).grid(row=0, column=1, sticky="ew", padx=5)
         ctk.CTkButton(btn_row, text="Descargar en PDF", fg_color="#5CB85C", text_color="#000000",
-                      font=("Arial", 10, "bold"), command=descargar).pack(side="left", padx=5)
+                      font=("Arial", 10, "bold"), command=descargar).grid(row=0, column=2, sticky="ew", padx=5)
         ctk.CTkButton(btn_row, text="Exportar a Excel", fg_color="#5CB85C", text_color="#000000",
-                      font=("Arial", 10, "bold"), command=exportar_excel).pack(side="left", padx=5)
+                      font=("Arial", 10, "bold"), command=exportar_excel).grid(row=0, column=3, sticky="ew", padx=5)
 
         ctk.CTkButton(modal, text="Cerrar", fg_color="#E0E0E0", text_color="#000000",
                       font=("Arial", 10, "bold"), width=120, command=modal.destroy).pack(pady=5)

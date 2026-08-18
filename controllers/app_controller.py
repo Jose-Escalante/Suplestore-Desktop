@@ -3,6 +3,8 @@ from tkinter import messagebox, ttk
 
 from models.database_model import DatabaseModel
 
+from services.ui_utils import traer_al_frente
+
 from views.login_view import LoginView
 from views.cambio_password_view import CambioPasswordView
 from views.panel_view import PanelView
@@ -177,6 +179,7 @@ class AppController:
             return
 
         top = ctk.CTkToplevel(self.root)
+        traer_al_frente(top)
         top.resizable(False, False)
         top.title("Alerta de Vencimiento Proximo")
         top.geometry("500x300")
