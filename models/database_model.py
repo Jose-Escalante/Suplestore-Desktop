@@ -91,11 +91,17 @@ class DatabaseModel:
     def registrar_producto_y_lote(self, nombre, id_cat, stock, costo, precio, vencimiento):
         return self.products.registrar_producto_y_lote(nombre, id_cat, stock, costo, precio, vencimiento)
 
+    def tiene_lote_activo(self, id_producto):
+        return self.products.tiene_lote_activo(id_producto)
+
     def agregar_lote_a_producto(self, id_producto, stock, costo, precio, vencimiento):
         return self.products.agregar_lote_a_producto(id_producto, stock, costo, precio, vencimiento)
 
     def obtener_lotes_por_producto(self, id_producto):
         return self.products.obtener_lotes_por_producto(id_producto)
+
+    def obtener_lotes_activos_por_producto(self, id_producto):
+        return self.products.obtener_lotes_activos_por_producto(id_producto)
 
     def actualizar_producto(self, id_producto, nombre, id_categoria):
         return self.products.actualizar_producto(id_producto, nombre, id_categoria)
@@ -115,8 +121,8 @@ class DatabaseModel:
     def obtener_siguiente_numero_control(self):
         return self.sales.obtener_siguiente_numero_control()
 
-    def registrar_venta_y_nota(self, id_usuario, id_cliente, metodo_pago, total_venta, monto_cancelado, carrito, descuento=0.0):
-        return self.sales.registrar_venta_y_nota(id_usuario, id_cliente, metodo_pago, total_venta, monto_cancelado, carrito, descuento)
+    def registrar_venta_y_nota(self, id_usuario, id_cliente, metodo_pago, total_venta, monto_cancelado, carrito, descuento=0.0, tipo_descuento="", porcentaje_descuento=""):
+        return self.sales.registrar_venta_y_nota(id_usuario, id_cliente, metodo_pago, total_venta, monto_cancelado, carrito, descuento, tipo_descuento, porcentaje_descuento)
 
     def obtener_historial_ventas(self):
         return self.sales.obtener_historial_ventas()

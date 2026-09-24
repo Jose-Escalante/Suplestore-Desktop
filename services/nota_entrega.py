@@ -97,18 +97,24 @@ def generar_nota_entrega(datos, ruta_salida=None):
         Paragraph("Descripcion", style_th),
         Paragraph("Cantidad", style_th_r),
         Paragraph("Precio Unit.", style_th_r),
+        Paragraph("Descuento", style_th_r),
         Paragraph("Subtotal", style_th_r)
     ]]
 
     for item in datos['items']:
+        desc_item = item.get('descuento', 0) or 0
+        texto_desc = item.get('porcentaje', '') or ''
+        if not texto_desc and desc_item > 0:
+            texto_desc = fmt(desc_item)
         table_data.append([
             Paragraph(item['descripcion'], style_td),
             Paragraph(str(item['cantidad']), style_td_r),
             Paragraph(fmt(item['precio']), style_td_r),
+            Paragraph(texto_desc if texto_desc else "-", style_td_r),
             Paragraph(fmt(item['subtotal']), style_td_r)
         ])
 
-    t_items = Table(table_data, colWidths=[260, 70, 85, 85])
+    t_items = Table(table_data, colWidths=[230, 55, 70, 75, 70])
     t_items.setStyle(TableStyle([
         ('LINEABOVE', (0,0), (-1,0), 1, colors.black),
         ('LINEBELOW', (0,0), (-1,0), 1, colors.black),
@@ -121,10 +127,16 @@ def generar_nota_entrega(datos, ruta_salida=None):
     elements.append(Spacer(1, 10))
 
     descuento = datos.get('descuento', 0) or 0
+    tipo_desc = datos.get('tipo_descuento') or ''
     totales_data = []
-    if descuento > 0:
+    if descuento > 0 and (tipo_desc in ("General", "Ambos") or not tipo_desc):
+        pct_desc = datos.get('porcentaje_descuento') or ''
+        etiqueta = "DESCUENTO GENERAL"
+        if pct_desc:
+            etiqueta += f" ({pct_desc})"
+        etiqueta += ":"
         totales_data.append([
-            Paragraph("DESCUENTO $:", style_total_lbl),
+            Paragraph(etiqueta, style_total_lbl),
             Paragraph(f"-{fmt(descuento)}", style_total_val)
         ])
     totales_data.append([

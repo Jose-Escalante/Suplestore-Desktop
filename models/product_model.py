@@ -25,8 +25,16 @@ class ProductModel:
             messagebox.showerror("Error Detallado", f"Ocurrio un error al registrar:\n{err}")
             return False
 
+    def tiene_lote_activo(self, id_producto):
+        query = "SELECT COUNT(*) AS total FROM lotes WHERE id_producto = %s AND estado = 'Activo' AND stock > 0"
+        self.db.cursor.execute(query, (id_producto,))
+        resultado = self.db.cursor.fetchone()
+        return (resultado["total"] if resultado else 0) > 0
+
     def agregar_lote_a_producto(self, id_producto, stock, costo, precio, vencimiento):
         try:
+            q_inactivo = "UPDATE lotes SET estado = 'Inactivo' WHERE id_producto = %s AND estado <> 'Inactivo'"
+            self.db.cursor.execute(q_inactivo, (id_producto,))
             q_lote = "INSERT INTO lotes (id_producto, stock, costo, precio, fecha_vencimiento, estado) VALUES (%s, %s, %s, %s, %s, 'Activo')"
             self.db.cursor.execute(q_lote, (id_producto, stock, costo, precio, vencimiento))
             self.db.commit()
@@ -38,6 +46,11 @@ class ProductModel:
 
     def obtener_lotes_por_producto(self, id_producto):
         query = "SELECT * FROM lotes WHERE id_producto = %s"
+        self.db.cursor.execute(query, (id_producto,))
+        return self.db.cursor.fetchall()
+
+    def obtener_lotes_activos_por_producto(self, id_producto):
+        query = "SELECT * FROM lotes WHERE id_producto = %s AND estado = 'Activo'"
         self.db.cursor.execute(query, (id_producto,))
         return self.db.cursor.fetchall()
 

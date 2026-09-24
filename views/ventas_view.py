@@ -54,8 +54,11 @@ class VentasView:
         self.entry_cliente.pack(fill="x", expand=True)
 
         self.sugerencias_frame = None
+        self._ultimas_coincidencias = []
         self.entry_cliente.bind("<KeyRelease>", self._filtrar_clientes)
-        self.entry_cliente.bind("<FocusOut>", lambda e: self.root.after(200, self._ocultar_sugerencias))
+        self.entry_cliente.bind("<FocusOut>", self._programar_ocultar_sugerencias)
+        self.entry_cliente.bind("<Return>", self._seleccionar_primer_match)
+        self.entry_cliente.bind("<Escape>", lambda e: self._ocultar_sugerencias())
 
         row_producto = ctk.CTkFrame(col_a, fg_color="#333333")
         row_producto.pack(fill="x", pady=4)
@@ -172,6 +175,7 @@ class VentasView:
 
         coincidencias = [item for item in self.clientes_list
                          if texto in item[0].lower() or texto in item[2]["cedula"]]
+        self._ultimas_coincidencias = coincidencias
         if not coincidencias:
             self.cliente_id_seleccionado = None
             return
@@ -196,6 +200,38 @@ class VentasView:
             self.sugerencias_frame.destroy()
             self.sugerencias_frame = None
 
+    def _programar_ocultar_sugerencias(self, event=None):
+        self.root.after(250, self._revisar_ocultar_sugerencias)
+
+    def _revisar_ocultar_sugerencias(self):
+        if self.sugerencias_frame is None:
+            return
+        try:
+            if not self.sugerencias_frame.winfo_exists():
+                self.sugerencias_frame = None
+                return
+        except Exception:
+            self.sugerencias_frame = None
+            return
+        x, y = self.root.winfo_pointerxy()
+        bajo_raton = self.root.winfo_containing(x, y)
+        w = bajo_raton
+        while w is not None:
+            if w is self.sugerencias_frame:
+                return
+            try:
+                w = w.master
+            except AttributeError:
+                break
+        self._ocultar_sugerencias()
+
+    def _seleccionar_primer_match(self, event=None):
+        if self._ultimas_coincidencias:
+            label, cid, cdata = self._ultimas_coincidencias[0]
+            self._seleccionar_cliente(cid, label, cdata)
+        else:
+            self._ocultar_sugerencias()
+
     def _on_producto_selected(self, valor):
         self._actualizar_stock_label()
 
@@ -208,7 +244,22 @@ class VentasView:
             else:
                 self.lbl_stock.configure(text=f"Stock: {item['Stock']}", text_color="#FFFFFF")
 
+    def _recalcular_item(self, item):
+        base = item["cantidad"] * item["precio"]
+        desc = item.get("descuento", 0.0) or 0.0
+        valor = item.get("valor_desc_item", 0) or 0
+        if item.get("tipo_desc_item") == "Porcentaje (%)" and valor > 0:
+            desc = round(base * valor / 100, 2)
+        if desc > base:
+            desc = base
+        item["descuento"] = desc
+        item["subtotal"] = round(base - desc, 2)
+
     def agregar_item(self):
+        if self.cliente_id_seleccionado is None:
+            messagebox.showwarning("Cliente", "Seleccione un cliente valido antes de agregar productos al carrito.")
+            return
+
         seleccion_prod = self.combo_productos.get()
         if not seleccion_prod or seleccion_prod not in self.productos_dict:
             messagebox.showwarning("Seleccion", "Seleccione un producto valido.")
@@ -240,7 +291,7 @@ class VentasView:
                     messagebox.showwarning("Stock Insuficiente", "La cantidad total excede el stock disponible.")
                     return
                 item["cantidad"] += cantidad
-                item["subtotal"] = item["cantidad"] * item["precio"] - item.get("descuento", 0.0)
+                self._recalcular_item(item)
                 encontrado = True
                 break
 
@@ -297,7 +348,7 @@ class VentasView:
                 messagebox.showerror("Error", "Ingrese una cantidad valida mayor a cero.", parent=modal)
                 return
             item_actual['cantidad'] = nueva_cant
-            item_actual['subtotal'] = nueva_cant * item_actual['precio'] - item_actual.get('descuento', 0.0)
+            self._recalcular_item(item_actual)
             self.actualizar_vista_carrito()
             modal.destroy()
 
@@ -330,6 +381,14 @@ class VentasView:
             total_general += item["subtotal"]
 
         self.lbl_total.configure(text=f"Precio a Pagar: ${total_general:.2f}")
+
+    def _texto_desc_item(self, item):
+        desc = item.get("descuento", 0) or 0
+        if desc <= 0:
+            return ""
+        if item.get("tipo_desc_item") == "Porcentaje (%)":
+            return f"{item.get('valor_desc_item', 0):.0f}%"
+        return f"${desc:.2f}"
 
     def descuento_item(self):
         seleccion = self.tree_carrito.selection()
@@ -379,6 +438,8 @@ class VentasView:
             if desc > base:
                 desc = base
             item_actual["descuento"] = desc
+            item_actual["tipo_desc_item"] = combo_tipo.get()
+            item_actual["valor_desc_item"] = valor
             item_actual["subtotal"] = round(base - desc, 2)
             self.actualizar_vista_carrito()
             modal.destroy()
@@ -450,6 +511,26 @@ class VentasView:
                 descuento = round(min(desc_val, total_base), 2)
             total_final = round(total_base - descuento, 2)
 
+            items_con_desc = [it for it in self.carrito_items if it.get("descuento", 0) > 0]
+            tiene_general = descuento > 0
+            tiene_items = len(items_con_desc) > 0
+            if tiene_general and tiene_items:
+                tipo_descuento = "Ambos"
+            elif tiene_general:
+                tipo_descuento = "General"
+            elif tiene_items:
+                tipo_descuento = "Individual"
+            else:
+                tipo_descuento = ""
+
+            pcts = []
+            if tiene_general:
+                if combo_desc_tipo.get() == "Porcentaje (%)":
+                    pcts.append(f"{desc_val:.0f}%")
+                elif total_base > 0:
+                    pcts.append(f"{descuento / total_base * 100:.1f}%")
+            porcentaje_descuento = " + ".join(pcts)
+
             try:
                 monto_cancelado = float(entry_monto.get().strip())
                 if monto_cancelado < total_final:
@@ -464,7 +545,8 @@ class VentasView:
             id_usuario = self.controller.usuario_actual["id_usuario"]
 
             resultado = self.controller.model.registrar_venta_y_nota(
-                id_usuario, id_cliente, metodo_pago, total_final, monto_cancelado, self.carrito_items, descuento
+                id_usuario, id_cliente, metodo_pago, total_final, monto_cancelado, self.carrito_items, descuento,
+                tipo_descuento, porcentaje_descuento
             )
             if resultado:
                 detalle_evento = f"Venta registrada: Nota {resultado['numero_control']} por ${total_final:.2f}"
@@ -484,9 +566,13 @@ class VentasView:
                     "metodo_pago": metodo_pago,
                     "total": total_final,
                     "descuento": descuento,
+                    "tipo_descuento": tipo_descuento,
+                    "porcentaje_descuento": porcentaje_descuento,
                     "total_cancelado": monto_cancelado,
                     "items": [{"descripcion": it["nombre"], "cantidad": it["cantidad"],
-                               "precio": it["precio"], "subtotal": it["subtotal"]}
+                               "precio": it["precio"], "subtotal": it["subtotal"],
+                               "descuento": it.get("descuento", 0) or 0,
+                               "porcentaje": self._texto_desc_item(it)}
                               for it in self.carrito_items]
                 }
                 ruta_pdf = generar_nota_entrega(datos_nota)
@@ -504,7 +590,7 @@ class VentasView:
         traer_al_frente(modal)
         modal.resizable(False, False)
         modal.title("Historial de Notas de Entrega")
-        modal.geometry("860x520")
+        modal.geometry("960x520")
         modal.configure(fg_color="#333333")
 
         ctk.CTkLabel(modal, text="Historial de Notas de Entrega", text_color="#FFFFFF",
@@ -523,9 +609,13 @@ class VentasView:
                 treeview.delete(row)
             for v in ventas:
                 desc = v.get("descuento", 0) or 0
+                tipo = v.get("tipo_descuento") or ""
+                pct = v.get("porcentaje_descuento") or ""
+                es_general = tipo in ("General", "Ambos") or (not tipo and desc > 0)
+                texto_desc = f"{pct}" if es_general and pct else "-"
                 treeview.insert("", "end", iid=str(v["id_venta"]), values=(
                     v["numero_control"], v["cliente"], v["vendedor"], v["metodo_pago"],
-                    f"${v['total']:.2f}", f"${desc:.2f}" if desc else "-",
+                    f"${v['total']:.2f}", texto_desc,
                     f"${v['monto_cancelado']:.2f}", v["fecha"]
                 ))
 
@@ -539,7 +629,6 @@ class VentasView:
             filas = [list(f) for f in filas]
             for f in filas:
                 f[4] = f[4].replace("$", "")
-                f[5] = 0 if f[5] == "-" else f[5].replace("$", "")
                 f[6] = f[6].replace("$", "")
             exportar_ventas_xlsx(ruta, headers, filas)
             messagebox.showinfo("Exito", f"Ventas exportadas en:\n{ruta}", parent=modal)
@@ -571,16 +660,26 @@ class VentasView:
         frame_t.pack(fill="both", expand=True, padx=15, pady=5)
 
         columns = ("id", "cliente", "vendedor", "pago", "total", "descuento", "cancelado", "fecha")
-        tree = ttk.Treeview(frame_t, columns=columns, show="headings", height=12)
+        tree = ttk.Treeview(frame_t, columns=columns, show="headings", height=12, selectmode="browse")
 
-        headers = ["N Nota", "Cliente", "Vendedor", "Metodo Pago", "Total ($)", "Descuento ($)", "Cancelado ($)", "Fecha y Hora"]
-        widths = [90, 120, 90, 95, 85, 95, 95, 140]
+        headers = ["N Nota", "Cliente", "Vendedor", "Metodo Pago", "Total ($)", "Descuento general (%)", "Cancelado ($)", "Fecha y Hora"]
+        widths = [90, 115, 85, 90, 80, 130, 90, 130]
         for col, head, w in zip(columns, headers, widths):
             tree.heading(col, text=head)
             tree.column(col, width=w, anchor="center")
         tree.pack(fill="both", expand=True)
 
         _poblar(tree, ventas_completas)
+        tree.focus_set()
+
+        def _marcar_fila(event):
+            fila = tree.identify_row(event.y)
+            if fila:
+                tree.selection_set(fila)
+                tree.focus(fila)
+
+        tree.bind("<Button-1>", _marcar_fila, add="+")
+        tree.bind("<Double-1>", lambda e: _marcar_fila(e) or ver_detalles())
 
         def ver_detalles():
             seleccion = tree.selection()
@@ -593,7 +692,7 @@ class VentasView:
             traer_al_frente(modal_det)
             modal_det.resizable(False, False)
             modal_det.title(f"Detalles de Nota {id_nota}")
-            modal_det.geometry("550x300")
+            modal_det.geometry("570x300")
             modal_det.configure(fg_color="#333333")
 
             ctk.CTkLabel(modal_det, text=f"Productos de la Nota de Entrega {id_nota}",
@@ -602,10 +701,10 @@ class VentasView:
             f_dt = ctk.CTkFrame(modal_det, fg_color="transparent")
             f_dt.pack(fill="both", expand=True, padx=15, pady=5)
 
-            cols_det = ("producto", "precio", "cantidad", "subtotal")
+            cols_det = ("producto", "precio", "cantidad", "descuento", "subtotal")
             tree_det = ttk.Treeview(f_dt, columns=cols_det, show="headings", height=6)
-            headers_det = ["Producto", "Precio Unit. ($)", "Cantidad", "Subtotal ($)"]
-            widths_det = [200, 100, 90, 100]
+            headers_det = ["Producto", "Precio Unit. ($)", "Cantidad", "Descuento", "Subtotal ($)"]
+            widths_det = [190, 95, 70, 90, 95]
             for c, h, w in zip(cols_det, headers_det, widths_det):
                 tree_det.heading(c, text=h)
                 tree_det.column(c, width=w, anchor="center")
@@ -613,8 +712,13 @@ class VentasView:
 
             detalles = self.controller.model.obtener_detalles_nota(id_nota)
             for d in detalles:
+                desc_det = d.get("descuento", 0) or 0
+                texto_det = d.get("porcentaje_descuento") or ""
+                if not texto_det and desc_det:
+                    texto_det = f"${desc_det:.2f}"
                 tree_det.insert("", "end", values=(
-                    d["nombre_producto"], f"${d['precio_unitario']:.2f}", d["cantidad"], f"${d['subtotal']:.2f}"
+                    d["nombre_producto"], f"${d['precio_unitario']:.2f}", d["cantidad"],
+                    texto_det if texto_det else "-", f"${d['subtotal']:.2f}"
                 ))
 
             ctk.CTkButton(modal_det, text="Cerrar", fg_color="#E0E0E0", text_color="#000000",
@@ -644,9 +748,13 @@ class VentasView:
                 "metodo_pago": cabecera["metodo_pago"],
                 "total": cabecera["monto_total"],
                 "descuento": cabecera.get("descuento", 0),
+                "tipo_descuento": cabecera.get("tipo_descuento") or "",
+                "porcentaje_descuento": cabecera.get("porcentaje_descuento") or "",
                 "total_cancelado": cabecera["monto_cancelado"],
                 "items": [{"descripcion": d["nombre_producto"], "cantidad": d["cantidad"],
-                           "precio": d["precio_unitario"], "subtotal": d["subtotal"]}
+                           "precio": d["precio_unitario"], "subtotal": d["subtotal"],
+                           "descuento": d.get("descuento", 0) or 0,
+                           "porcentaje": d.get("porcentaje_descuento") or ""}
                           for d in detalles]
             }
             ruta_pdf = generar_nota_entrega(datos_nota)
@@ -681,9 +789,13 @@ class VentasView:
                 "metodo_pago": cabecera["metodo_pago"],
                 "total": cabecera["monto_total"],
                 "descuento": cabecera.get("descuento", 0),
+                "tipo_descuento": cabecera.get("tipo_descuento") or "",
+                "porcentaje_descuento": cabecera.get("porcentaje_descuento") or "",
                 "total_cancelado": cabecera["monto_cancelado"],
                 "items": [{"descripcion": d["nombre_producto"], "cantidad": d["cantidad"],
-                           "precio": d["precio_unitario"], "subtotal": d["subtotal"]}
+                           "precio": d["precio_unitario"], "subtotal": d["subtotal"],
+                           "descuento": d.get("descuento", 0) or 0,
+                           "porcentaje": d.get("porcentaje_descuento") or ""}
                           for d in detalles]
             }
             ruta_pdf = generar_nota_entrega(datos_nota, ruta_salida=ruta)

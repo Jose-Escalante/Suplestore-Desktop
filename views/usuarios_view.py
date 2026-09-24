@@ -6,6 +6,14 @@ from PIL import Image
 from models.user_model import validar_complejidad
 from services.ui_utils import traer_al_frente
 
+ROLES = ["Administrador", "Almacenista", "Vendedor"]
+
+PRESETS_ROLES = {
+    "Administrador": [True, True, True, True, True, True],
+    "Almacenista": [True, False, False, True, False, False],
+    "Vendedor": [False, False, False, False, False, False],
+}
+
 
 class UsuariosView:
     def __init__(self, controller):
@@ -102,7 +110,7 @@ class UsuariosView:
         e_pass.pack(padx=30)
 
         ctk.CTkLabel(modal, text="Rol:", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(10, 2))
-        combo_rol = ctk.CTkComboBox(modal, values=["Administrador", "Vendedor"], width=260, state="readonly",
+        combo_rol = ctk.CTkComboBox(modal, values=ROLES, width=260, state="readonly",
                                      command=self._cambiar_rol_evento_agregar)
         combo_rol.pack(padx=30)
         combo_rol.set("Administrador")
@@ -159,9 +167,9 @@ class UsuariosView:
     def _cambiar_rol_evento_agregar(self, valor):
         if not hasattr(self, '_vars_agregar'):
             return
-        es_admin = (valor == "Administrador")
-        for var in self._vars_agregar:
-            var.set(es_admin)
+        preset = PRESETS_ROLES.get(valor, [False] * 6)
+        for var, on in zip(self._vars_agregar, preset):
+            var.set(on)
 
     def abrir_modal_actualizar(self):
         seleccion = self.tree.selection()
@@ -195,10 +203,10 @@ class UsuariosView:
         e_user_pass.pack(padx=30)
 
         ctk.CTkLabel(modal, text="Rol:", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(10, 2))
-        combo_rol = ctk.CTkComboBox(modal, values=["Administrador", "Vendedor"], width=260, state="readonly",
+        combo_rol = ctk.CTkComboBox(modal, values=ROLES, width=260, state="readonly",
                                      command=self._cambiar_rol_evento_actualizar)
         combo_rol.pack(padx=30)
-        combo_rol.set(rol_act if rol_act in ["Administrador", "Vendedor"] else "Administrador")
+        combo_rol.set(rol_act if rol_act in ROLES else "Administrador")
 
         var_inv = ctk.BooleanVar(value=bool(permisos_actuales["modulo_inventario"]) if permisos_actuales else True)
         var_cli = ctk.BooleanVar(value=bool(permisos_actuales["modulo_clientes"]) if permisos_actuales else True)
@@ -259,9 +267,9 @@ class UsuariosView:
     def _cambiar_rol_evento_actualizar(self, valor):
         if not hasattr(self, '_vars_actualizar'):
             return
-        es_admin = (valor == "Administrador")
-        for var in self._vars_actualizar:
-            var.set(es_admin)
+        preset = PRESETS_ROLES.get(valor, [False] * 6)
+        for var, on in zip(self._vars_actualizar, preset):
+            var.set(on)
 
     def abrir_modal_resetear(self):
         seleccion = self.tree.selection()

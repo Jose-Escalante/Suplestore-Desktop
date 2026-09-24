@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `cambio_obligatorio` TINYINT(1)   NOT NULL DEFAULT '0',
   `intentos_fallidos`  INT          NOT NULL DEFAULT '0',
   `bloqueado_hasta`    DATETIME     DEFAULT NULL,
-  `rol`                ENUM('Administrador','Vendedor') COLLATE utf8mb4_spanish_ci NOT NULL DEFAULT 'Vendedor',
+  `rol`                ENUM('Administrador','Almacenista','Vendedor') COLLATE utf8mb4_spanish_ci NOT NULL DEFAULT 'Vendedor',
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `usuario` (`usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
@@ -134,6 +134,8 @@ CREATE TABLE IF NOT EXISTS `notas_entrega` (
   `fecha_hora`      DATETIME      DEFAULT CURRENT_TIMESTAMP,
   `monto_total`     DECIMAL(10,2) NOT NULL,
   `descuento`       DECIMAL(10,2) NOT NULL DEFAULT '0.00',
+  `tipo_descuento`  VARCHAR(15)   COLLATE utf8mb4_spanish_ci NOT NULL DEFAULT '',
+  `porcentaje_descuento` VARCHAR(40) COLLATE utf8mb4_spanish_ci NOT NULL DEFAULT '',
   `metodo_pago`     VARCHAR(50)   COLLATE utf8mb4_spanish_ci NOT NULL,
   `monto_cancelado` DECIMAL(10,2) NOT NULL,
   `anio`            SMALLINT      NOT NULL,
@@ -160,6 +162,8 @@ CREATE TABLE IF NOT EXISTS `detalle_nota` (
   `precio_unitario` DECIMAL(10,2) NOT NULL,
   `cantidad`        INT           NOT NULL,
   `subtotal`        DECIMAL(10,2) NOT NULL,
+  `descuento`       DECIMAL(10,2) NOT NULL DEFAULT '0.00',
+  `porcentaje_descuento` VARCHAR(20) COLLATE utf8mb4_spanish_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id_detalle`),
   KEY `numero_nota` (`numero_nota`),
   KEY `id_producto` (`id_producto`),

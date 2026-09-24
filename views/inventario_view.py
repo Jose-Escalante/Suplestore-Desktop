@@ -348,6 +348,9 @@ class InventarioView:
         prod = self.obtener_producto_seleccionado()
         if not prod:
             return
+        if self.controller.model.tiene_lote_activo(prod["id"]):
+            messagebox.showwarning("Lote activo", "El producto ya tiene un lote activo. Debe agotar el lote actual antes de registrar uno nuevo.")
+            return
 
         modal = ctk.CTkToplevel(self.root)
         traer_al_frente(modal)
@@ -452,6 +455,12 @@ class InventarioView:
                 messagebox.showerror("Error", "Revise los formatos (Stock entero positivo, Costo/Venta numericos)", parent=modal)
                 return
 
+            if venta < costo / stock:
+                messagebox.showerror("Precio invalido",
+                                     f"El precio por unidad (${venta:.2f}) es menor al costo por unidad (${costo/stock:.2f}).\nEsto generaria perdidas.",
+                                     parent=modal)
+                return
+
             if self.controller.model.agregar_lote_a_producto(prod["id"], stock, costo, venta, venc):
                 messagebox.showinfo("Exito", "Lote agregado y stock actualizado correctamente", parent=modal)
                 modal.destroy()
@@ -493,7 +502,7 @@ class InventarioView:
             tree.column(col, width=90, anchor="w")
         tree.pack(fill="both", expand=True)
 
-        lotes = self.controller.model.obtener_lotes_por_producto(prod["id"])
+        lotes = self.controller.model.obtener_lotes_activos_por_producto(prod["id"])
         for l in lotes:
             tree.insert("", "end", values=(l["id_lote"], l["stock"], l["costo"], l["precio"], l["fecha_vencimiento"], l["estado"]))
 
@@ -610,6 +619,12 @@ class InventarioView:
                     raise ValueError
             except ValueError:
                 messagebox.showerror("Error", "Revise los formatos (Stock entero positivo, Costo/Precio numericos)", parent=modal)
+                return
+
+            if precio < costo / stock:
+                messagebox.showerror("Precio invalido",
+                                     f"El precio por unidad (${precio:.2f}) es menor al costo por unidad (${costo/stock:.2f}).\nEsto generaria perdidas.",
+                                     parent=modal)
                 return
 
             if self.controller.model.actualizar_lote(int(lote["id_lote"]), stock, costo, precio, venc):
