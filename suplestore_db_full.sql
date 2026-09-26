@@ -32,7 +32,17 @@ USE `suplestore_db`;
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
--- 2.1. usuarios: credenciales, rol y seguridad de cada usuario del sistema.
+-- 2.1. roles: catalogo de roles del sistema (Administrador, Vendedor).
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `roles` (
+  `id_rol`     INT          NOT NULL AUTO_INCREMENT,
+  `nombre_rol` VARCHAR(50)  COLLATE utf8mb4_spanish_ci NOT NULL,
+  PRIMARY KEY (`id_rol`),
+  UNIQUE KEY `nombre_rol` (`nombre_rol`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+
+-- ----------------------------------------------------------------------------
+-- 2.2. usuarios: credenciales, rol y seguridad de cada usuario del sistema.
 --      cambio_obligatorio fuerza el cambio de clave en el proximo login.
 --      intentos_fallidos / bloqueado_hasta implementan el bloqueo temporal
 --      tras 5 intentos fallidos (5 minutos).
@@ -44,13 +54,16 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `cambio_obligatorio` TINYINT(1)   NOT NULL DEFAULT '0',
   `intentos_fallidos`  INT          NOT NULL DEFAULT '0',
   `bloqueado_hasta`    DATETIME     DEFAULT NULL,
-  `rol`                ENUM('Administrador','Almacenista','Vendedor') COLLATE utf8mb4_spanish_ci NOT NULL DEFAULT 'Vendedor',
+  `id_rol`             INT          NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_usuario`),
-  UNIQUE KEY `usuario` (`usuario`)
+  UNIQUE KEY `usuario` (`usuario`),
+  KEY `id_rol` (`id_rol`),
+  CONSTRAINT `fk_usuarios_rol` FOREIGN KEY (`id_rol`)
+    REFERENCES `roles` (`id_rol`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- ----------------------------------------------------------------------------
--- 2.2. permisos_usuario: permisos por modulo para cada usuario (1=acceso).
+-- 2.3. permisos_usuario: permisos por modulo para cada usuario (1=acceso).
 --      Se eliminan en cascada junto con el usuario.
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `permisos_usuario` (
@@ -69,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `permisos_usuario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- ----------------------------------------------------------------------------
--- 2.3. categorias: clasificacion de productos
+-- 2.4. categorias: clasificacion de productos
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `categorias` (
   `id_categoria`     INT          NOT NULL AUTO_INCREMENT,
@@ -79,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `categorias` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- ----------------------------------------------------------------------------
--- 2.4. clientes: personas que realizan compras (cedula unica)
+-- 2.5. clientes: personas que realizan compras (cedula unica)
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `clientes` (
   `id_cliente` INT         NOT NULL AUTO_INCREMENT,
@@ -91,7 +104,7 @@ CREATE TABLE IF NOT EXISTS `clientes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- ----------------------------------------------------------------------------
--- 2.5. productos: items del inventario, pertenecen a una categoria
+-- 2.6. productos: items del inventario, pertenecen a una categoria
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `productos` (
   `id_producto`     INT          NOT NULL AUTO_INCREMENT,
@@ -104,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `productos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- ----------------------------------------------------------------------------
--- 2.6. lotes: unidades de un producto con stock, costo, precio y vencimiento.
+-- 2.7. lotes: unidades de un producto con stock, costo, precio y vencimiento.
 --      Se eliminan en cascada junto con el producto.
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `lotes` (
@@ -122,9 +135,9 @@ CREATE TABLE IF NOT EXISTS `lotes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- ----------------------------------------------------------------------------
--- 2.7. notas_entrega: cabecera de cada venta.
---      anio + secuencia forman el numero de control NNNN-AA (reinicio anual,
---      unicidad por uk_anio_secuencia). descuento guarda el descuento total
+-- 2.8. notas_entrega: cabecera de cada venta.
+--      numero_nota es el numero de control de la nota (correlativo global que
+--      nunca se reinicia ni se reutiliza). descuento guarda el descuento total
 --      aplicado a la venta (por items y/o global).
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `notas_entrega` (
@@ -138,10 +151,7 @@ CREATE TABLE IF NOT EXISTS `notas_entrega` (
   `porcentaje_descuento` VARCHAR(40) COLLATE utf8mb4_spanish_ci NOT NULL DEFAULT '',
   `metodo_pago`     VARCHAR(50)   COLLATE utf8mb4_spanish_ci NOT NULL,
   `monto_cancelado` DECIMAL(10,2) NOT NULL,
-  `anio`            SMALLINT      NOT NULL,
-  `secuencia`       INT           NOT NULL,
   PRIMARY KEY (`numero_nota`),
-  UNIQUE KEY `uk_anio_secuencia` (`anio`,`secuencia`),
   KEY `id_cliente` (`id_cliente`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `notas_entrega_ibfk_1` FOREIGN KEY (`id_cliente`)
@@ -151,7 +161,7 @@ CREATE TABLE IF NOT EXISTS `notas_entrega` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- ----------------------------------------------------------------------------
--- 2.8. detalle_nota: lineas de producto de cada nota de entrega.
+-- 2.9. detalle_nota: lineas de producto de cada nota de entrega.
 --      Se elimina en cascada junto con la nota.
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `detalle_nota` (
@@ -177,17 +187,6 @@ CREATE TABLE IF NOT EXISTS `detalle_nota` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- ----------------------------------------------------------------------------
--- 2.9. secuencia_notas: consecutivo de notas de entrega por anio.
---      La app crea/actualiza la fila del anio actual automaticamente al
---      registrar una venta (INSERT ... ON DUPLICATE KEY UPDATE).
--- ----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `secuencia_notas` (
-  `anio`        SMALLINT NOT NULL,
-  `consecutivo` INT      NOT NULL,
-  PRIMARY KEY (`anio`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
-
--- ----------------------------------------------------------------------------
 -- 2.10. eventos: bitacora de actividades del sistema (login, ventas,
 --       cambios de contrasena, respaldos). Si se elimina el usuario del
 --       evento, el registro se conserva con id_usuario = NULL.
@@ -208,21 +207,42 @@ CREATE TABLE IF NOT EXISTS `eventos` (
 -- 3. DATOS INICIALES
 -- ============================================================================
 
--- 3.1. Usuario administrador por defecto.
---      Usuario: admin | Contrasena: admin123 (encriptada con bcrypt)
-INSERT INTO `usuarios` (`id_usuario`, `usuario`, `contrasena`, `cambio_obligatorio`, `rol`) VALUES
-(1, 'admin', '$2b$12$cN.BRaTRqS0xc6gFyV7squ880B5vmTT3RYSOUQuD/Kq.3.raO5LfS', 0, 'Administrador');
+-- 3.1. Roles del sistema (Administrador y Vendedor)
+INSERT INTO `roles` (`id_rol`, `nombre_rol`) VALUES
+(1, 'Administrador'),
+(2, 'Vendedor');
 
--- 3.2. Permisos totales para el administrador
+-- 3.2. Usuario administrador por defecto.
+--      Usuario: admin | Contrasena: admin123 (encriptada con bcrypt)
+INSERT INTO `usuarios` (`id_usuario`, `usuario`, `contrasena`, `cambio_obligatorio`, `id_rol`) VALUES
+(1, 'admin', '$2b$12$cN.BRaTRqS0xc6gFyV7squ880B5vmTT3RYSOUQuD/Kq.3.raO5LfS', 0, 1);
+
+-- 3.3. Permisos totales para el administrador
 INSERT INTO `permisos_usuario` (`id_usuario`, `modulo_inventario`, `modulo_clientes`, `modulo_ventas`, `modulo_categorias`, `modulo_usuarios`, `modulo_historial`) VALUES
 (1, 1, 1, 1, 1, 1, 1);
 
--- 3.3. Cliente generico para ventas sin cliente definido
+-- 3.4. Cliente generico para ventas sin cliente definido
 INSERT INTO `clientes` (`id_cliente`, `nombre`, `cedula`, `telefono`) VALUES
 (1, 'Cliente General', 'V-00000000', '0414-0000000');
 
--- 3.4. Secuencia de notas de entrega iniciada en cero para el anio actual
-INSERT INTO `secuencia_notas` (`anio`, `consecutivo`) VALUES (YEAR(CURDATE()), 0);
+-- 3.5. Categorias de productos (inventario de ejemplo)
+INSERT INTO `categorias` (`id_categoria`, `nombre_categoria`) VALUES
+(1, 'Proteínas'),
+(2, 'Creatinas'),
+(3, 'Pre-entrenos'),
+(4, 'Vitaminas');
+
+-- 3.6. Productos de ejemplo
+INSERT INTO `productos` (`id_producto`, `nombre_producto`, `id_categoria`) VALUES
+(1, 'Whein Protein', 1),
+(2, 'Creatina Nutrex', 1),
+(3, 'Creatina normal', 2);
+
+-- 3.7. Lotes de los productos (stock, costo, precio y vencimiento)
+INSERT INTO `lotes` (`id_lote`, `id_producto`, `stock`, `costo`, `precio`, `fecha_vencimiento`, `estado`) VALUES
+(1, 1, 4, 300.00, 30.00, '2027-08-16', 'Activo'),
+(2, 2, 10, 500.00, 51.00, '2027-09-23', 'Activo'),
+(3, 3, 10, 500.00, 60.00, '2027-09-16', 'Activo');
 
 -- ============================================================================
 -- 4. VISTAS (definiciones identicas a las de produccion)

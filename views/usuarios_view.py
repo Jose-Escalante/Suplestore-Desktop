@@ -6,11 +6,8 @@ from PIL import Image
 from models.user_model import validar_complejidad
 from services.ui_utils import traer_al_frente
 
-ROLES = ["Administrador", "Almacenista", "Vendedor"]
-
 PRESETS_ROLES = {
     "Administrador": [True, True, True, True, True, True],
-    "Almacenista": [True, False, False, True, False, False],
     "Vendedor": [False, False, False, False, False, False],
 }
 
@@ -19,6 +16,7 @@ class UsuariosView:
     def __init__(self, controller):
         self.controller = controller
         self.root = controller.root
+        self.roles = [r["nombre_rol"] for r in self.controller.model.obtener_roles()]
         icons_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "icons")
 
         def ico(name, size=52):
@@ -110,7 +108,7 @@ class UsuariosView:
         e_pass.pack(padx=30)
 
         ctk.CTkLabel(modal, text="Rol:", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(10, 2))
-        combo_rol = ctk.CTkComboBox(modal, values=ROLES, width=260, state="readonly",
+        combo_rol = ctk.CTkComboBox(modal, values=self.roles, width=260, state="readonly",
                                      command=self._cambiar_rol_evento_agregar)
         combo_rol.pack(padx=30)
         combo_rol.set("Administrador")
@@ -203,10 +201,10 @@ class UsuariosView:
         e_user_pass.pack(padx=30)
 
         ctk.CTkLabel(modal, text="Rol:", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(10, 2))
-        combo_rol = ctk.CTkComboBox(modal, values=ROLES, width=260, state="readonly",
+        combo_rol = ctk.CTkComboBox(modal, values=self.roles, width=260, state="readonly",
                                      command=self._cambiar_rol_evento_actualizar)
         combo_rol.pack(padx=30)
-        combo_rol.set(rol_act if rol_act in ROLES else "Administrador")
+        combo_rol.set(rol_act if rol_act in self.roles else "Vendedor")
 
         var_inv = ctk.BooleanVar(value=bool(permisos_actuales["modulo_inventario"]) if permisos_actuales else True)
         var_cli = ctk.BooleanVar(value=bool(permisos_actuales["modulo_clientes"]) if permisos_actuales else True)

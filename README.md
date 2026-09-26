@@ -52,6 +52,7 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 ```
 Suplestore Desktop/
 ├── main.py                        # Punto de entrada
+├── AGENTS.md                      # Guía para agentes IA
 ├── requirements.txt               # Dependencias del proyecto
 ├── README.md                      # Documentación general
 ├── suplestore_db_full.sql         # Script de inicialización de BD

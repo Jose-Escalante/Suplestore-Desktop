@@ -26,8 +26,17 @@ class UserModel:
     def __init__(self, db):
         self.db = db
 
+    def _id_rol(self, nombre_rol):
+        self.db.cursor.execute("SELECT id_rol FROM roles WHERE nombre_rol = %s", (nombre_rol,))
+        fila = self.db.cursor.fetchone()
+        return fila["id_rol"] if fila else 1
+
     def intentar_login(self, usuario, contrasena):
-        query = "SELECT * FROM usuarios WHERE usuario = %s"
+        query = (
+            "SELECT u.*, r.nombre_rol AS rol "
+            "FROM usuarios u JOIN roles r ON u.id_rol = r.id_rol "
+            "WHERE u.usuario = %s"
+        )
         self.db.cursor.execute(query, (usuario,))
         row = self.db.cursor.fetchone()
         if not row:
@@ -79,16 +88,25 @@ class UserModel:
         resultado = self.intentar_login(usuario, contrasena)
         return resultado["usuario"] if resultado["estado"] == "ok" else None
 
+    def obtener_roles(self):
+        query = "SELECT id_rol, nombre_rol FROM roles ORDER BY id_rol"
+        self.db.cursor.execute(query)
+        return self.db.cursor.fetchall()
+
     def obtener_usuarios(self):
-        query = "SELECT id_usuario, usuario, rol FROM usuarios"
+        query = (
+            "SELECT u.id_usuario, u.usuario, r.nombre_rol AS rol "
+            "FROM usuarios u JOIN roles r ON u.id_rol = r.id_rol"
+        )
         self.db.cursor.execute(query)
         return self.db.cursor.fetchall()
 
     def agregar_usuario(self, usuario, contrasena, rol, permisos):
         try:
             hash_pwd = bcrypt.hashpw(contrasena.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-            query = "INSERT INTO usuarios (usuario, contrasena, cambio_obligatorio, rol) VALUES (%s, %s, 1, %s)"
-            self.db.cursor.execute(query, (usuario, hash_pwd, rol))
+            id_rol = self._id_rol(rol)
+            query = "INSERT INTO usuarios (usuario, contrasena, cambio_obligatorio, id_rol) VALUES (%s, %s, 1, %s)"
+            self.db.cursor.execute(query, (usuario, hash_pwd, id_rol))
             self.db.commit()
             id_nuevo_usuario = self.db.cursor.lastrowid
             q_permisos = "INSERT INTO permisos_usuario (id_usuario, modulo_inventario, modulo_clientes, modulo_ventas, modulo_categorias, modulo_usuarios, modulo_historial) VALUES (%s, %s, %s, %s, %s, %s, %s)"
@@ -109,13 +127,14 @@ class UserModel:
 
     def actualizar_usuario(self, id_usuario, usuario, contrasena, rol, permisos):
         try:
+            id_rol = self._id_rol(rol)
             if contrasena:
                 hash_pwd = bcrypt.hashpw(contrasena.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-                query = "UPDATE usuarios SET usuario = %s, contrasena = %s, cambio_obligatorio = 1, rol = %s WHERE id_usuario = %s"
-                self.db.cursor.execute(query, (usuario, hash_pwd, rol, id_usuario))
+                query = "UPDATE usuarios SET usuario = %s, contrasena = %s, cambio_obligatorio = 1, id_rol = %s WHERE id_usuario = %s"
+                self.db.cursor.execute(query, (usuario, hash_pwd, id_rol, id_usuario))
             else:
-                query = "UPDATE usuarios SET usuario = %s, rol = %s WHERE id_usuario = %s"
-                self.db.cursor.execute(query, (usuario, rol, id_usuario))
+                query = "UPDATE usuarios SET usuario = %s, id_rol = %s WHERE id_usuario = %s"
+                self.db.cursor.execute(query, (usuario, id_rol, id_usuario))
             q_permisos = "UPDATE permisos_usuario SET modulo_inventario = %s, modulo_clientes = %s, modulo_ventas = %s, modulo_categorias = %s, modulo_usuarios = %s, modulo_historial = %s WHERE id_usuario = %s"
             self.db.cursor.execute(q_permisos, (
                 permisos["inventario"],

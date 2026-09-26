@@ -25,6 +25,9 @@ class DatabaseModel:
     def intentar_login(self, usuario, contrasena):
         return self.users.intentar_login(usuario, contrasena)
 
+    def obtener_roles(self):
+        return self.users.obtener_roles()
+
     def obtener_usuarios(self):
         return self.users.obtener_usuarios()
 
