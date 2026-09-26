@@ -109,7 +109,7 @@ class UserModel:
             self.db.cursor.execute(query, (usuario, hash_pwd, id_rol))
             self.db.commit()
             id_nuevo_usuario = self.db.cursor.lastrowid
-            q_permisos = "INSERT INTO permisos_usuario (id_usuario, modulo_inventario, modulo_clientes, modulo_ventas, modulo_categorias, modulo_usuarios, modulo_historial) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            q_permisos = "INSERT INTO permisos_usuario (id_usuario, modulo_inventario, modulo_clientes, modulo_ventas, modulo_categorias, modulo_usuarios, modulo_historial, modulo_reportes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             self.db.cursor.execute(q_permisos, (
                 id_nuevo_usuario,
                 permisos["inventario"],
@@ -117,7 +117,8 @@ class UserModel:
                 permisos["ventas"],
                 permisos["categorias"],
                 permisos["usuarios"],
-                permisos["historial"]
+                permisos["historial"],
+                permisos["reportes"]
             ))
             self.db.commit()
             return True
@@ -135,7 +136,7 @@ class UserModel:
             else:
                 query = "UPDATE usuarios SET usuario = %s, id_rol = %s WHERE id_usuario = %s"
                 self.db.cursor.execute(query, (usuario, id_rol, id_usuario))
-            q_permisos = "UPDATE permisos_usuario SET modulo_inventario = %s, modulo_clientes = %s, modulo_ventas = %s, modulo_categorias = %s, modulo_usuarios = %s, modulo_historial = %s WHERE id_usuario = %s"
+            q_permisos = "UPDATE permisos_usuario SET modulo_inventario = %s, modulo_clientes = %s, modulo_ventas = %s, modulo_categorias = %s, modulo_usuarios = %s, modulo_historial = %s, modulo_reportes = %s WHERE id_usuario = %s"
             self.db.cursor.execute(q_permisos, (
                 permisos["inventario"],
                 permisos["clientes"],
@@ -143,6 +144,7 @@ class UserModel:
                 permisos["categorias"],
                 permisos["usuarios"],
                 permisos["historial"],
+                permisos["reportes"],
                 id_usuario
             ))
             self.db.commit()

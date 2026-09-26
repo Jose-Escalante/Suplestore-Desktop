@@ -6,6 +6,7 @@ from .product_model import ProductModel
 from .sale_model import SaleModel
 from .event_model import EventModel
 from .backup_model import BackupModel
+from .report_model import ReportModel
 
 
 class DatabaseModel:
@@ -18,6 +19,7 @@ class DatabaseModel:
         self.sales = SaleModel(self.db)
         self.events = EventModel(self.db)
         self.backup = BackupModel(self.db)
+        self.reports = ReportModel(self.db)
 
     def validar_login(self, usuario, contrasena):
         return self.users.validar_login(usuario, contrasena)
@@ -138,3 +140,36 @@ class DatabaseModel:
 
     def obtener_detalles_nota(self, numero_nota):
         return self.sales.obtener_detalles_nota(numero_nota)
+
+    def obtener_metricas_kpi(self):
+        return self.reports.metricas_kpi()
+
+    def reporte_ventas_por_periodo(self, periodo):
+        return self.reports.ventas_por_periodo(periodo)
+
+    def reporte_productos_mas_vendidos(self, periodo):
+        return self.reports.productos_mas_vendidos(periodo)
+
+    def reporte_productos_menos_vendidos(self, periodo):
+        return self.reports.productos_menos_vendidos(periodo)
+
+    def reporte_ventas_por_cliente(self, periodo):
+        return self.reports.ventas_por_cliente(periodo)
+
+    def reporte_ventas_por_vendedor(self, periodo):
+        return self.reports.ventas_por_vendedor(periodo)
+
+    def reporte_ventas_por_metodo_pago(self, periodo):
+        return self.reports.ventas_por_metodo_pago(periodo)
+
+    def reporte_descuentos_aplicados(self, periodo):
+        return self.reports.descuentos_aplicados(periodo)
+
+    def reporte_productos_stock_bajo(self, limite=5):
+        return self.reports.productos_stock_bajo(limite)
+
+    def reporte_clientes_inactivos(self, dias=90):
+        return self.reports.clientes_inactivos(dias)
+
+    def reporte_vencimientos_lotes(self, dias=None):
+        return self.reports.vencimientos_lotes(dias)

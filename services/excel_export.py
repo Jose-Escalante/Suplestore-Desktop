@@ -3,10 +3,10 @@ from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
 
 
-def exportar_ventas_xlsx(ruta, headers, filas):
+def exportar_ventas_xlsx(ruta, headers, filas, titulo="Ventas"):
     wb = Workbook()
     ws = wb.active
-    ws.title = "Ventas"
+    ws.title = titulo[:31]
 
     ws.append(headers)
     encabezado_fill = PatternFill(start_color="5CB85C", end_color="5CB85C", fill_type="solid")

@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS `permisos_usuario` (
   `modulo_categorias` TINYINT(1) DEFAULT '0',
   `modulo_usuarios`   TINYINT(1) DEFAULT '0',
   `modulo_historial`  TINYINT(1) NOT NULL DEFAULT '0',
+  `modulo_reportes`   TINYINT(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_permiso`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `permisos_usuario_ibfk_1` FOREIGN KEY (`id_usuario`)
@@ -218,8 +219,8 @@ INSERT INTO `usuarios` (`id_usuario`, `usuario`, `contrasena`, `cambio_obligator
 (1, 'admin', '$2b$12$cN.BRaTRqS0xc6gFyV7squ880B5vmTT3RYSOUQuD/Kq.3.raO5LfS', 0, 1);
 
 -- 3.3. Permisos totales para el administrador
-INSERT INTO `permisos_usuario` (`id_usuario`, `modulo_inventario`, `modulo_clientes`, `modulo_ventas`, `modulo_categorias`, `modulo_usuarios`, `modulo_historial`) VALUES
-(1, 1, 1, 1, 1, 1, 1);
+INSERT INTO `permisos_usuario` (`id_usuario`, `modulo_inventario`, `modulo_clientes`, `modulo_ventas`, `modulo_categorias`, `modulo_usuarios`, `modulo_historial`, `modulo_reportes`) VALUES
+(1, 1, 1, 1, 1, 1, 1, 1);
 
 -- 3.4. Cliente generico para ventas sin cliente definido
 INSERT INTO `clientes` (`id_cliente`, `nombre`, `cedula`, `telefono`) VALUES

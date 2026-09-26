@@ -15,7 +15,7 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 - Permisos por módulo para cada usuario (Administrador / Vendedor).
 
 **Panel de control**
-- Acceso por módulos según permisos: Inventario, Clientes, Ventas, Usuarios, Categorías, Historial y Respaldo BD.
+- Acceso por módulos según permisos: Inventario, Clientes, Ventas, Usuarios, Categorías, Historial, Reportes y Respaldo BD.
 
 **Inventario**
 - Gestión de productos y lotes: stock, costos, precios y fechas de vencimiento.
@@ -26,7 +26,7 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 - Carrito de compras con agregar/editar/eliminar productos y validación de stock.
 - **Descuento por producto** (% o $) y **descuento global** (% o $) en el pago.
 - Métodos de pago: Efectivo ($), Punto de Venta y Pago Móvil.
-- Emisión de **nota de entrega en PDF** con consecutivo anual `NNNN-YY`.
+- Emisión de **nota de entrega en PDF** con número de control correlativo global (por ejemplo `0009`), único e irrepetible.
 
 **Notas de entrega**
 - Historial de ventas con búsqueda por cédula del cliente.
@@ -40,6 +40,11 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 **Historial (bitácora)**
 - Registro automático de eventos: inicios/cierre de sesión, ventas, cambios y reseteos de contraseña y respaldos.
 - Filtros por usuario, detalle y tipo de evento. Visible solo para administradores. Útil como evidencia ante sabotajes.
+
+**Reportes gerenciales**
+- Módulo independiente (permiso propio `modulo_reportes`) con resumen diario/semanal/mensual.
+- Reportes: ventas por período, productos más y menos vendidos, ventas por cliente/vendedor/método de pago, descuentos aplicados, stock bajo, clientes inactivos y vencimientos de lotes.
+- Tarjetas KPI (ventas de hoy, ventas del mes, notas registradas y producto top) y **exportación a Excel** de cada reporte.
 
 **Copias de seguridad**
 - Exportar la base de datos a un archivo `.sql` y restaurarla desde uno (con confirmación de reemplazo).
@@ -68,7 +73,8 @@ Suplestore Desktop/
 │   ├── product_model.py           # ProductModel: productos y lotes
 │   ├── sale_model.py              # SaleModel: ventas, notas y descuentos
 │   ├── event_model.py             # EventModel: bitácora de eventos
-│   └── backup_model.py            # BackupModel: exportar/importar respaldos SQL
+│   ├── backup_model.py            # BackupModel: exportar/importar respaldos SQL
+│   └── report_model.py            # ReportModel: consultas agregadas de reportes
 ├── controllers/
 │   └── app_controller.py          # CAPA CONTROLADOR: estado, navegación, permisos
 ├── services/
@@ -83,7 +89,8 @@ Suplestore Desktop/
     ├── clientes_view.py           # CRUD clientes
     ├── ventas_view.py             # Ventas, carrito, pago e historial de notas
     ├── inventario_view.py         # Inventario y lotes
-    └── historial_view.py          # Historial de eventos (bitácora)
+    ├── historial_view.py          # Historial de eventos (bitácora)
+    └── reportes_view.py           # Reportes gerenciales (KPI + tablas + Excel)
 ```
 
 ### Flujo de datos

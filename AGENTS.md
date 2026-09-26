@@ -23,6 +23,7 @@ Suplestore Desktop/
 │   ├── sale_model.py                 # SaleModel: ventas, notas y descuentos
 │   ├── event_model.py                # EventModel: bitácora de eventos
 │   └── backup_model.py               # BackupModel: exportar/importar respaldos SQL
+│   └── report_model.py               # ReportModel: consultas agregadas de reportes
 ├── controllers/
 │   └── app_controller.py             # CAPA CONTROLADOR: estado, navegación, permisos
 ├── services/
@@ -38,6 +39,7 @@ Suplestore Desktop/
     ├── ventas_view.py                # CAPA VISTA: módulo de ventas + carrito + historial notas
     ├── inventario_view.py            # CAPA VISTA: inventario y lotes
     └── historial_view.py             # CAPA VISTA: historial de eventos (bitácora)
+    └── reportes_view.py              # CAPA VISTA: reportes gerenciales (KPI + tablas + Excel)
 ```
 
 ## Principios SOLID aplicados
@@ -55,6 +57,7 @@ Cada modelo tiene **una única responsabilidad**:
 | `SaleModel` | `sale_model.py` | Notas de entrega, ventas y descuentos |
 | `EventModel` | `event_model.py` | Bitácora de eventos |
 | `BackupModel` | `backup_model.py` | Exportar/importar respaldos SQL |
+| `ReportModel` | `report_model.py` | Reportes gerenciales (agregaciones SOLO lectura) |
 | `DatabaseModel` | `database_model.py` | Fachada (delega a los modelos SRP) |
 
 **Regla:** Si necesitas modificar la lógica de clientes, solo tocas `client_model.py`. Nunca mezcles responsabilidades.
@@ -116,6 +119,7 @@ controller.show_clientes()
 controller.show_ventas()
 controller.show_inventario()
 controller.show_historial()
+controller.show_reportes()
 ```
 
 ### 6. Seguridad y contraseñas
@@ -129,6 +133,7 @@ controller.show_historial()
 - `EventModel` registra eventos en la tabla `eventos`; el controller expone `self.controller.registrar_evento(tipo, detalle)`.
 - Registrar eventos en: login, logout, venta confirmada, cambio/reset de contraseña, respaldo exportado/importado.
 - `modulo_historial` (TINYINT) en `permisos_usuario` controla el acceso a `show_historial()`.
+- `modulo_reportes` (TINYINT) en `permisos_usuario` controla el acceso a `show_reportes()`.
 - La tabla `eventos` tiene `fk_eventos_usuario ON DELETE SET NULL` para poder eliminar usuarios aunque tengan eventos.
 
 ### 8. Convenciones de código

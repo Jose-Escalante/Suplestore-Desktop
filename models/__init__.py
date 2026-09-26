@@ -5,3 +5,6 @@ from .client_model import ClientModel
 from .category_model import CategoryModel
 from .product_model import ProductModel
 from .sale_model import SaleModel
+from .event_model import EventModel
+from .backup_model import BackupModel
+from .report_model import ReportModel

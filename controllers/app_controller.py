@@ -14,6 +14,7 @@ from views.clientes_view import ClientesView
 from views.ventas_view import VentasView
 from views.inventario_view import InventarioView
 from views.historial_view import HistorialView
+from views.reportes_view import ReportesView
 
 
 class AppController:
@@ -55,7 +56,8 @@ class AppController:
             "ventas": permisos["modulo_ventas"],
             "categorias": permisos["modulo_categorias"],
             "usuarios": permisos["modulo_usuarios"],
-            "historial": permisos["modulo_historial"]
+            "historial": permisos["modulo_historial"],
+            "reportes": permisos["modulo_reportes"]
         }
         return bool(mapa_permisos.get(modulo, False))
 
@@ -120,6 +122,12 @@ class AppController:
             return
         self.limpiar_ventana()
         self.current_view = HistorialView(self)
+
+    def show_reportes(self):
+        if not self.verificar_permiso_o_rechazar("reportes"):
+            return
+        self.limpiar_ventana()
+        self.current_view = ReportesView(self)
 
     def registrar_evento(self, tipo, detalle=None):
         if not self.usuario_actual:

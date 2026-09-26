@@ -73,6 +73,11 @@ class PanelView:
                       width=btn_width, height=btn_height, corner_radius=8,
                       command=self.abrir_modal_respaldo).grid(row=2, column=1, padx=5, pady=8)
 
+        ctk.CTkButton(grid_frame, text="Reportes", image=icon("ventas_ver_ventas"), compound="left",
+                      fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),
+                      width=btn_width, height=btn_height, corner_radius=8,
+                      command=controller.show_reportes).grid(row=2, column=0, padx=5, pady=8)
+
         cerrar_frame = ctk.CTkFrame(container, fg_color="#3B3B3B")
         cerrar_frame.pack(fill="x", pady=(10, 20))
 
