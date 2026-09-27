@@ -1,7 +1,7 @@
 try:
     import matplotlib
     matplotlib.use("TkAgg")
-    from matplotlib.ticker import FuncFormatter
+    from matplotlib.ticker import FuncFormatter, MaxNLocator
     from matplotlib.figure import Figure
     GRAFICOS_OK = True
 except Exception:
@@ -53,6 +53,8 @@ def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, ro
     ax.bar(etiquetas, valores, color=colores, width=0.35)
     if es_dinero:
         ax.yaxis.set_major_formatter(FuncFormatter(_dolar))
+    else:
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     if rotacion:
         ax.tick_params(axis="x", rotation=rotacion)
     ax.margins(y=0.15)
@@ -66,6 +68,7 @@ def _descuentos(filas):
     fig, ax = _base("Notas con Descuento")
     ax.grid(axis="x", color="none")
     ax.bar(["Con descuento", "Sin descuento"], [con, sin], color=[VERDE, GRIS], width=0.35)
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax.margins(y=0.15)
     return fig
 
