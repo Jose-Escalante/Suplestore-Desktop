@@ -44,7 +44,7 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 **Reportes gerenciales**
 - Módulo independiente (permiso propio `modulo_reportes`) con filtro de periodo semanal, mensual y anual (ventanas móviles de 7, 30 y 365 días).
 - Reportes: ventas por período, productos más y menos vendidos, ventas por cliente/vendedor/método de pago, descuentos aplicados, stock bajo, clientes inactivos y vencimientos de lotes.
-- Tarjetas KPI (ventas de hoy, ventas del mes, notas registradas y producto top), **gráficos de barras** con matplotlib (tema oscuro acorde a la app) en los reportes clave (ventas por período, más vendidos, método de pago, stock bajo y vencimientos de lotes) y **exportación a Excel** de cada reporte.
+- Tarjetas KPI (ventas de hoy, ventas del mes, notas registradas y producto top), **gráficos de barras** con matplotlib (tema oscuro acorde a la app) en los reportes clave (ventas por período, más vendidos, método de pago y stock bajo) y **exportación a Excel** de cada reporte.
 
 **Copias de seguridad**
 - Exportar la base de datos a un archivo `.sql` y restaurarla desde uno (con confirmación de reemplazo).

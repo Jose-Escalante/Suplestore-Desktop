@@ -10,7 +10,6 @@ except Exception:
 BG = "#3B3B3B"
 FG = "#EEEEEE"
 VERDE = "#5CB85C"
-NARANJA = "#E0A800"
 ANCHO = 6.2
 ALTO = 2.2
 
@@ -50,12 +49,11 @@ def _vertical(filas, key_x, key_y, titulo, periodo_label=""):
     return fig
 
 
-def _horizontal(filas, key_etiqueta, key_valor, titulo, dinero=False, verdes_por_dias=False):
+def _horizontal(filas, key_etiqueta, key_valor, titulo, dinero=False):
     fig, ax = _base(titulo)
     etiquetas = [str(f[key_etiqueta]) for f in filas][::-1]
     valores = [float(f[key_valor]) for f in filas][::-1]
-    colores = [NARANJA if v <= 30 else VERDE for v in valores] if verdes_por_dias else VERDE
-    ax.barh(etiquetas, valores, color=colores, height=0.6)
+    ax.barh(etiquetas, valores, color=VERDE, height=0.6)
     if dinero:
         ax.xaxis.set_major_formatter(FuncFormatter(_dolar))
     ax.margins(x=0.12)
@@ -67,7 +65,6 @@ TIPOS_CON_GRAFICO = {
     "Productos mas Vendidos",
     "Ventas por Metodo de Pago",
     "Productos con Stock Bajo",
-    "Vencimientos de Lotes",
 }
 
 
@@ -82,12 +79,6 @@ def crear_grafico(tipo, filas, periodo_label=""):
         return _horizontal(filas, "metodo_pago", "total", "Ventas por Metodo de Pago", dinero=True)
     if tipo == "Productos con Stock Bajo":
         return _horizontal(filas, "nombre_producto", "stock_total", "Stock Disponible")
-    if tipo == "Vencimientos de Lotes":
-        filas_aux = [
-            {**f, "etiqueta": f"{f['nombre_producto']} (L{f['lote']})"}
-            for f in filas
-        ]
-        return _horizontal(filas_aux, "etiqueta", "dias", "Dias Restantes para Vencer", verdes_por_dias=True)
     return None
 
 
