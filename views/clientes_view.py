@@ -43,6 +43,12 @@ class ClientesView:
         self.e_nombre = ctk.CTkEntry(row_nombre, font=("Arial", 11), width=260, validate="key", validatecommand=(vcmd_nombre, "%P"))
         self.e_nombre.pack(side="left")
 
+        row_apellido = ctk.CTkFrame(left_panel, fg_color="#3B3B3B")
+        row_apellido.pack(fill="x", pady=5)
+        ctk.CTkLabel(row_apellido, text="Apellido:", text_color="#FFFFFF", font=("Arial", 11), width=80, anchor="w").pack(side="left")
+        self.e_apellido = ctk.CTkEntry(row_apellido, font=("Arial", 11), width=260, validate="key", validatecommand=(vcmd_nombre, "%P"))
+        self.e_apellido.pack(side="left")
+
         row_cedula = ctk.CTkFrame(left_panel, fg_color="#3B3B3B")
         row_cedula.pack(fill="x", pady=5)
         ctk.CTkLabel(row_cedula, text="Cedula:", text_color="#FFFFFF", font=("Arial", 11), width=80, anchor="w").pack(side="left")
@@ -100,13 +106,13 @@ class ClientesView:
         scrollbar = ttk.Scrollbar(table_frame, orient="vertical")
         scrollbar.pack(side="right", fill="y")
 
-        columns = ("id", "Nombre", "Cedula", "Telefono")
+        columns = ("id", "Nombre", "Apellido", "Cedula", "Telefono")
         self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=15,
                                  yscrollcommand=scrollbar.set)
         scrollbar.config(command=self.tree.yview)
 
-        headers = ["ID", "Nombre", "Cedula", "Telefono"]
-        widths = [60, 180, 130, 130]
+        headers = ["ID", "Nombre", "Apellido", "Cedula", "Telefono"]
+        widths = [60, 140, 140, 120, 120]
         for col, head, w in zip(columns, headers, widths):
             self.tree.heading(col, text=head)
             self.tree.column(col, width=w, anchor="w")
@@ -123,10 +129,12 @@ class ClientesView:
         self._id_seleccionado = valores[0]
         self.e_nombre.delete(0, ctk.END)
         self.e_nombre.insert(0, valores[1])
+        self.e_apellido.delete(0, ctk.END)
+        self.e_apellido.insert(0, valores[2])
         self.e_cedula.delete(0, ctk.END)
-        self.e_cedula.insert(0, valores[2])
+        self.e_cedula.insert(0, valores[3])
         self.e_telefono.delete(0, ctk.END)
-        self.e_telefono.insert(0, valores[3] if valores[3] else "")
+        self.e_telefono.insert(0, valores[4] if valores[4] else "")
 
     def cargar_datos(self, data=None):
         for row in self.tree.get_children():
@@ -135,24 +143,26 @@ class ClientesView:
             data = self.controller.model.obtener_clientes()
             self.all_data = data
         for c in data:
-            self.tree.insert("", "end", values=(c["id_cliente"], c["nombre"], c["cedula"], c["telefono"]))
+            self.tree.insert("", "end", values=(c["id_cliente"], c["nombre"], c["apellido"], c["cedula"], c["telefono"]))
 
     def buscar(self):
         texto = self.entry_search.get().strip().lower()
         if not texto:
             self.cargar_datos(self.all_data)
             return
-        filtrados = [item for item in self.all_data if texto in str(item["nombre"]).lower() or texto in str(item["cedula"])]
+        filtrados = [item for item in self.all_data if texto in str(item["nombre"]).lower() or texto in str(item["apellido"]).lower() or texto in str(item["cedula"])]
         self.cargar_datos(filtrados)
 
     def _limpiar_formulario(self):
         self.e_nombre.delete(0, ctk.END)
+        self.e_apellido.delete(0, ctk.END)
         self.e_cedula.delete(0, ctk.END)
         self.e_telefono.delete(0, ctk.END)
         self._id_seleccionado = None
 
     def ingresar_cliente(self):
         nombre = self.e_nombre.get().strip()
+        apellido = self.e_apellido.get().strip()
         cedula = self.e_cedula.get().strip()
         telefono = self.e_telefono.get().strip()
         if not nombre or not cedula:
@@ -161,7 +171,7 @@ class ClientesView:
         if not (7 <= len(cedula) <= 8):
             messagebox.showwarning("Cedula invalida", "La cedula debe tener entre 7 y 8 digitos")
             return
-        if self.controller.model.agregar_cliente(nombre, cedula, telefono):
+        if self.controller.model.agregar_cliente(nombre, apellido, cedula, telefono):
             messagebox.showinfo("Exito", "Cliente registrado correctamente")
             self._limpiar_formulario()
             self.cargar_datos()
@@ -171,6 +181,7 @@ class ClientesView:
             messagebox.showwarning("Seleccion requerida", "Seleccione un cliente de la tabla para modificar.")
             return
         nombre = self.e_nombre.get().strip()
+        apellido = self.e_apellido.get().strip()
         cedula = self.e_cedula.get().strip()
         telefono = self.e_telefono.get().strip()
         if not nombre or not cedula:
@@ -179,7 +190,7 @@ class ClientesView:
         if not (7 <= len(cedula) <= 8):
             messagebox.showwarning("Cedula invalida", "La cedula debe tener entre 7 y 8 digitos")
             return
-        if self.controller.model.actualizar_cliente(self._id_seleccionado, nombre, cedula, telefono):
+        if self.controller.model.actualizar_cliente(self._id_seleccionado, nombre, apellido, cedula, telefono):
             messagebox.showinfo("Exito", "Cliente actualizado correctamente")
             self._limpiar_formulario()
             self.cargar_datos()
@@ -189,7 +200,9 @@ class ClientesView:
             messagebox.showwarning("Seleccion requerida", "Seleccione un cliente de la tabla para eliminar.")
             return
         nombre = self.e_nombre.get().strip()
-        confirmacion = messagebox.askyesno("Confirmar Eliminacion", f"Esta seguro que desea eliminar al cliente '{nombre}'?")
+        apellido = self.e_apellido.get().strip()
+        nombre_completo = f"{nombre} {apellido}".strip()
+        confirmacion = messagebox.askyesno("Confirmar Eliminacion", f"Esta seguro que desea eliminar al cliente '{nombre_completo}'?")
         if confirmacion:
             if self.controller.model.eliminar_cliente(self._id_seleccionado):
                 messagebox.showinfo("Exito", "Cliente eliminado correctamente")

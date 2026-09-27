@@ -34,7 +34,7 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 - **Exportar a Excel** (`.xlsx`) de las ventas listadas.
 
 **Clientes y Categorías**
-- CRUD de clientes (nombre, cédula, teléfono).
+- CRUD de clientes (nombre, apellido, cédula, teléfono).
 - CRUD de categorías de productos.
 
 **Historial (bitácora)**

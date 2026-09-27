@@ -90,7 +90,7 @@ class SaleModel:
         query = """
             SELECT n.numero_nota AS id_venta,
                    LPAD(n.numero_nota, 4, '0') AS numero_control,
-                   c.nombre AS cliente, c.cedula, u.usuario AS vendedor,
+                   CONCAT_WS(' ', NULLIF(c.nombre, ''), NULLIF(c.apellido, '')) AS cliente, c.cedula, u.usuario AS vendedor,
                    n.metodo_pago, n.monto_total AS total, n.descuento, n.tipo_descuento, n.porcentaje_descuento, n.monto_cancelado, n.fecha_hora AS fecha
             FROM notas_entrega n
             JOIN clientes c ON n.id_cliente = c.id_cliente
@@ -104,7 +104,7 @@ class SaleModel:
         query = """
             SELECT n.numero_nota AS id_venta,
                    LPAD(n.numero_nota, 4, '0') AS numero_control,
-                   c.nombre AS cliente, c.cedula, u.usuario AS vendedor,
+                   CONCAT_WS(' ', NULLIF(c.nombre, ''), NULLIF(c.apellido, '')) AS cliente, c.cedula, u.usuario AS vendedor,
                    n.metodo_pago, n.monto_total AS total, n.descuento, n.tipo_descuento, n.porcentaje_descuento, n.monto_cancelado, n.fecha_hora AS fecha
             FROM notas_entrega n
             JOIN clientes c ON n.id_cliente = c.id_cliente
@@ -120,7 +120,7 @@ class SaleModel:
             query = """
                 SELECT n.numero_nota, n.metodo_pago, n.monto_total, n.descuento, n.tipo_descuento, n.porcentaje_descuento, n.monto_cancelado, n.fecha_hora,
                        LPAD(n.numero_nota, 4, '0') AS numero_control,
-                       c.nombre AS cliente, c.cedula, c.telefono
+                       CONCAT_WS(' ', NULLIF(c.nombre, ''), NULLIF(c.apellido, '')) AS cliente, c.cedula, c.telefono
                 FROM notas_entrega n
                 JOIN clientes c ON n.id_cliente = c.id_cliente
                 WHERE n.numero_nota = %s

@@ -59,10 +59,10 @@ class ReportModel:
 
     def ventas_por_cliente(self, periodo):
         self.db.cursor.execute(
-            "SELECT c.nombre, COUNT(*) AS notas, SUM(n.monto_total) AS total "
+            "SELECT CONCAT_WS(' ', NULLIF(c.nombre, ''), NULLIF(c.apellido, '')) AS nombre, COUNT(*) AS notas, SUM(n.monto_total) AS total "
             "FROM notas_entrega n JOIN clientes c ON n.id_cliente = c.id_cliente "
             "WHERE DATE(n.fecha_hora) BETWEEN %s AND %s "
-            "GROUP BY c.id_cliente, c.nombre ORDER BY total DESC",
+            "GROUP BY c.id_cliente, c.nombre, c.apellido ORDER BY total DESC",
             self._rango(periodo))
         return self.db.cursor.fetchall()
 
@@ -104,9 +104,9 @@ class ReportModel:
 
     def clientes_inactivos(self, dias=90):
         self.db.cursor.execute(
-            "SELECT c.nombre, c.cedula, c.telefono, MAX(n.fecha_hora) AS ultima_venta "
+            "SELECT CONCAT_WS(' ', NULLIF(c.nombre, ''), NULLIF(c.apellido, '')) AS nombre, c.cedula, c.telefono, MAX(n.fecha_hora) AS ultima_venta "
             "FROM clientes c LEFT JOIN notas_entrega n ON n.id_cliente = c.id_cliente "
-            "GROUP BY c.id_cliente, c.nombre, c.cedula, c.telefono "
+            "GROUP BY c.id_cliente, c.nombre, c.apellido, c.cedula, c.telefono "
             "HAVING MAX(n.fecha_hora) IS NULL OR MAX(n.fecha_hora) < DATE_SUB(NOW(), INTERVAL %s DAY) "
             "ORDER BY ultima_venta ASC",
             (dias,))

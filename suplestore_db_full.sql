@@ -98,6 +98,7 @@ CREATE TABLE IF NOT EXISTS `categorias` (
 CREATE TABLE IF NOT EXISTS `clientes` (
   `id_cliente` INT         NOT NULL AUTO_INCREMENT,
   `nombre`     VARCHAR(150) COLLATE utf8mb4_spanish_ci NOT NULL,
+  `apellido`   VARCHAR(100) COLLATE utf8mb4_spanish_ci NOT NULL DEFAULT '',
   `cedula`     VARCHAR(20) COLLATE utf8mb4_spanish_ci NOT NULL,
   `telefono`   VARCHAR(20) COLLATE utf8mb4_spanish_ci DEFAULT NULL,
   PRIMARY KEY (`id_cliente`),
@@ -223,8 +224,8 @@ INSERT INTO `permisos_usuario` (`id_usuario`, `modulo_inventario`, `modulo_clien
 (1, 1, 1, 1, 1, 1, 1, 1);
 
 -- 3.4. Cliente generico para ventas sin cliente definido
-INSERT INTO `clientes` (`id_cliente`, `nombre`, `cedula`, `telefono`) VALUES
-(1, 'Cliente General', 'V-00000000', '0414-0000000');
+INSERT INTO `clientes` (`id_cliente`, `nombre`, `apellido`, `cedula`, `telefono`) VALUES
+(1, 'Cliente General', '', 'V-00000000', '0414-0000000');
 
 -- 3.5. Categorias de productos (inventario de ejemplo)
 INSERT INTO `categorias` (`id_categoria`, `nombre_categoria`) VALUES

@@ -72,11 +72,11 @@ class DatabaseModel:
     def buscar_cliente_por_cedula(self, cedula):
         return self.clients.buscar_cliente_por_cedula(cedula)
 
-    def agregar_cliente(self, nombre, cedula, telefono):
-        return self.clients.agregar_cliente(nombre, cedula, telefono)
+    def agregar_cliente(self, nombre, apellido, cedula, telefono):
+        return self.clients.agregar_cliente(nombre, apellido, cedula, telefono)
 
-    def actualizar_cliente(self, id_cliente, nombre, cedula, telefono):
-        return self.clients.actualizar_cliente(id_cliente, nombre, cedula, telefono)
+    def actualizar_cliente(self, id_cliente, nombre, apellido, cedula, telefono):
+        return self.clients.actualizar_cliente(id_cliente, nombre, apellido, cedula, telefono)
 
     def eliminar_cliente(self, id_cliente):
         return self.clients.eliminar_cliente(id_cliente)

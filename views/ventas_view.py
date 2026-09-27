@@ -43,7 +43,7 @@ class VentasView:
         ctk.CTkLabel(row_cliente, text="Cliente:", text_color="#FFFFFF", font=("Arial", 11), width=62, anchor="w").pack(side="left", padx=(0, 5), fill="y")
 
         clientes_raw = controller.model.obtener_clientes()
-        self.clientes_list = [(f"{c['nombre']} ({c['cedula']})", c['id_cliente'], c) for c in clientes_raw]
+        self.clientes_list = [((" ".join(filter(None, [c.get("nombre", ""), c.get("apellido", "")])) or c.get("cedula", "")) + f" ({c['cedula']})", c['id_cliente'], c) for c in clientes_raw]
         self.clientes_data = {c['id_cliente']: c for c in clientes_raw}
         self.cliente_id_seleccionado = None
 
@@ -560,7 +560,7 @@ class VentasView:
                     "direccion": "Centro Comercial Boulevard\nLos Mangos, Local 34, Barrio\nObrero. San Cristobal, Estado\nTachira.",
                     "num_nota": resultado["numero_control"],
                     "fecha": fecha_actual,
-                    "cliente": cl_data.get("nombre", ""),
+                    "cliente": " ".join(filter(None, [cl_data.get("nombre", ""), cl_data.get("apellido", "")])),
                     "ci": cl_data.get("cedula", ""),
                     "telefono": cl_data.get("telefono", ""),
                     "metodo_pago": metodo_pago,
