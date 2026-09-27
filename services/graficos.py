@@ -75,17 +75,30 @@ def _descuentos(filas):
 
 def _inactivos(filas):
     hoy = date.today()
-    datos = []
+    etiquetas = []
+    valores = []
+    colores = []
     for f in filas:
+        etiquetas.append(f["nombre"])
         ultima = f.get("ultima_venta")
         if ultima:
             if hasattr(ultima, "date"):
                 ultima = ultima.date()
-            dias = (hoy - ultima).days
-            datos.append({"nombre": f["nombre"], "dias": dias})
-    if not datos:
+            valores.append(max(0, (hoy - ultima).days))
+            colores.append(VERDE)
+        else:
+            valores.append(int(f.get("dias_filtro") or 30))
+            colores.append(GRIS)
+    if not valores:
         return None
-    return _vertical(datos, "nombre", "dias", "Dias Sin Comprar", rotacion=30)
+    etiquetas = [e[:24] for e in etiquetas]
+    fig, ax = _base("Dias Sin Comprar")
+    ax.grid(axis="x", color="none")
+    ax.bar(etiquetas, valores, color=colores, width=0.35)
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.tick_params(axis="x", rotation=30)
+    ax.margins(y=0.15)
+    return fig
 
 
 TIPOS_CON_GRAFICO = {

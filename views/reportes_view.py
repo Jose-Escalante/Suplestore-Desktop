@@ -217,6 +217,8 @@ class ReportesView:
             exportar = [(f["nombre_producto"], f["stock_total"]) for f in filas]
         elif tipo == "Clientes Inactivos":
             filas = model.reporte_clientes_inactivos(dias or 90)
+            for f in filas:
+                f["dias_filtro"] = dias or 90
             headers = ["Cliente", "Cedula", "Telefono", "Ultima Venta"]
             mostrar = [(f["nombre"], f["cedula"], f["telefono"], self._fecha(f["ultima_venta"])) for f in filas]
             exportar = [(f["nombre"], f["cedula"], f["telefono"], str(f["ultima_venta"])) for f in filas]
