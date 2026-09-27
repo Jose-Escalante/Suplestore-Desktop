@@ -29,12 +29,13 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 - Emisión de **nota de entrega en PDF** con número de control correlativo global (por ejemplo `0009`), único e irrepetible.
 
 **Notas de entrega**
-- Historial de ventas con búsqueda por cédula del cliente.
+- Historial de ventas con búsqueda por cédula del cliente y **filtro por período** (Todas, Hoy, Última Semana, Último Mes, Último Año) combinable con la cédula, con resumen de notas y total del período filtrado, y botón **"Limpiar Filtros"**.
 - Ver detalles de productos, **reimprimir** PDF y **descargar el PDF** a una ruta elegida.
-- **Exportar a Excel** (`.xlsx`) de las ventas listadas.
+- **Exportar a Excel** (`.xlsx`) de las ventas listadas (respeta el filtro aplicado).
 
 **Clientes y Categorías**
 - CRUD de clientes (nombre, apellido, cédula, teléfono).
+- **Validación de teléfono** (opcional, 11 dígitos que inician en "04") y **verificación de cédula duplicada** al registrar o modificar, para no fallar ni saltar ids.
 - CRUD de categorías de productos.
 
 **Historial (bitácora)**
@@ -42,7 +43,7 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 - Filtros por usuario, detalle y tipo de evento. Visible solo para administradores. Útil como evidencia ante sabotajes.
 
 **Reportes gerenciales**
-- Módulo independiente (permiso propio `modulo_reportes`) con filtro de periodo semanal, mensual y anual (ventanas móviles de 7, 30 y 365 días).
+- Módulo independiente (permiso propio `modulo_reportes`) con filtro de periodo semanal, mensual y anual (ventanas móviles de 7, 30 y 365 días); el período **Último Año agrupa por mes** para que el gráfico no se empalme.
 - Reportes: ventas por período, productos más y menos vendidos, ventas por cliente/vendedor/método de pago, descuentos aplicados, stock bajo, clientes inactivos y vencimientos de lotes.
 - Tarjetas KPI (ventas de hoy, ventas del mes, notas registradas y producto top), **gráficos de barras** con matplotlib (tema oscuro acorde a la app) en **todos los reportes** (el de vencimientos marca en naranja los lotes que vencen en ≤ 30 días) y **exportación a Excel** de cada reporte.
 
@@ -107,7 +108,7 @@ Vista (View) → Controlador (Controller) → DatabaseModel (facade)
 ## Requisitos
 
 - Python 3.8+
-- MySQL 5.7+ / 8.0
+- MySQL 5.7+ (desarrollado y probado sobre MySQL 8.0/9.x)
 - Conexión de red al servidor MySQL
 
 ## Instalación
@@ -120,7 +121,7 @@ Dependencias: `mysql-connector-python`, `customtkinter`, `PIL/pillow`, `tkcalend
 
 ## Configuración de base de datos
 
-Ejecutar el script de inicialización `suplestore_db_full.sql` para crear la base de datos `suplestore_db` con sus tablas, vistas y datos iniciales (usuario admin).
+Ejecutar el script de inicialización `suplestore_db_full.sql` para crear la base de datos `suplestore_db` con sus tablas, vistas y datos iniciales mínimos (usuario admin, categorías, productos y lotes base; sin datos de ventas).
 
 Las credenciales de conexión se configuran únicamente en un archivo `.env` en la raíz del proyecto (no se sube a git); la app no se conecta sin él.
 
