@@ -39,8 +39,8 @@ def _etiqueta_dia(valor):
     return str(valor)
 
 
-def _vertical(filas, key_x, key_y, titulo):
-    fig, ax = _base(titulo)
+def _vertical(filas, key_x, key_y, titulo, periodo_label=""):
+    fig, ax = _base(f"{titulo} - {periodo_label}".strip(" -") if periodo_label else titulo)
     ax.grid(axis="x", color="none")
     ax.bar([_etiqueta_dia(f[key_x]) for f in filas],
            [float(f[key_y]) for f in filas],
@@ -71,11 +71,11 @@ TIPOS_CON_GRAFICO = {
 }
 
 
-def crear_grafico(tipo, filas):
+def crear_grafico(tipo, filas, periodo_label=""):
     if not GRAFICOS_OK or not filas or tipo not in TIPOS_CON_GRAFICO:
         return None
     if tipo == "Ventas por Periodo":
-        return _vertical(filas, "dia", "total", "Ventas por Dia")
+        return _vertical(filas, "dia", "total", "Ventas por Dia", periodo_label)
     if tipo == "Productos mas Vendidos":
         return _horizontal(filas, "nombre_producto", "unidades", "Unidades Vendidas por Producto")
     if tipo == "Ventas por Metodo de Pago":

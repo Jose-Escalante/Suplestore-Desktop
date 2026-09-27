@@ -372,8 +372,9 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================================
 -- 9. REPORTES GERENCIALES (models/report_model.py)
---      La mayoria recibe un rango de fechas. La app calcula hoy / ultimos
---      7 dias / ultimos 30 dias segun el selector del modulo Reportes.
+--      La mayoria recibe un rango de fechas. La app calcula ventanas moviles
+--      desde hoy hacia atras: semana (7 dias), mes (30 dias) o anio (365 dias),
+--      segun el selector del modulo Reportes.
 -- ============================================================================
 
 -- 9.1. KPI del modulo: tarjetas resumen (ventas de hoy, del mes, notas

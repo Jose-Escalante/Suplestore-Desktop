@@ -7,10 +7,10 @@ class ReportModel:
 
     def _rango(self, periodo):
         hoy = date.today()
-        if periodo == "hoy":
-            inicio = hoy
-        elif periodo == "semana":
+        if periodo == "semana":
             inicio = hoy - timedelta(days=6)
+        elif periodo == "anio":
+            inicio = hoy - timedelta(days=364)
         else:
             inicio = hoy - timedelta(days=29)
         return inicio.isoformat(), hoy.isoformat()

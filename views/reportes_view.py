@@ -6,10 +6,10 @@ import customtkinter as ctk
 from services.excel_export import exportar_ventas_xlsx
 from services.graficos import crear_grafico, crear_canvas, GRAFICOS_OK
 
-PERIODOS = ["Hoy", "Ultimos 7 dias", "Ultimos 30 dias"]
+PERIODOS = ["Ultima semana", "Ultimo mes", "Ultimo anio"]
 OPCIONES_DIAS = ["30 dias", "60 dias", "90 dias", "Todos"]
 
-PERIODO_KEY = {"Hoy": "hoy", "Ultimos 7 dias": "semana", "Ultimos 30 dias": "mes"}
+PERIODO_KEY = {"Ultima semana": "semana", "Ultimo mes": "mes", "Ultimo anio": "anio"}
 DIAS_KEY = {"30 dias": 30, "60 dias": 60, "90 dias": 90, "Todos": None}
 
 
@@ -99,7 +99,7 @@ class ReportesView:
         self.lbl_periodo = ctk.CTkLabel(sidebar, text="Periodo:", text_color="#FFFFFF", font=("Arial", 12))
         self.combo_periodo = ctk.CTkComboBox(sidebar, values=PERIODOS, state="readonly",
                                              font=("Arial", 12), dropdown_font=("Arial", 12))
-        self.combo_periodo.set("Ultimos 30 dias")
+        self.combo_periodo.set("Ultimo mes")
 
         self.lbl_dias = ctk.CTkLabel(sidebar, text="Filtro:", text_color="#FFFFFF", font=("Arial", 12))
         self.combo_dias = ctk.CTkComboBox(sidebar, values=OPCIONES_DIAS, state="readonly",
@@ -165,7 +165,7 @@ class ReportesView:
             ctk.CTkLabel(self.chart_frame, text="Graficos no disponibles en este equipo.",
                          text_color="#AAAAAA", font=("Arial", 13)).pack(expand=True)
             return
-        fig = crear_grafico(tipo, self._crudas)
+        fig = crear_grafico(tipo, self._crudas, self.combo_periodo.get())
         if fig is None:
             ctk.CTkLabel(self.chart_frame, text="Sin grafico para este reporte.",
                          text_color="#AAAAAA", font=("Arial", 13)).pack(expand=True)
