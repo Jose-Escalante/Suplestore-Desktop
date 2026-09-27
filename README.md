@@ -4,6 +4,21 @@ Sistema de gestión de ventas, inventario y clientes para el comercio **Suplesto
 
 Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQL.
 
+## Alcance del sistema
+
+El sistema consta de **ocho módulos de trabajo** interconectados y gobernados por un esquema de permisos por rol (Administrador o Vendedor):
+
+1. **Inicio de sesión y seguridad**: acceso con contraseñas cifradas (bcrypt), bloqueo temporal de 5 minutos tras 5 intentos fallidos, cambio obligatorio de contraseña en el primer ingreso y aviso de lotes próximos a vencer (< 90 días).
+2. **Inventario y categorías**: catálogo de productos por lotes con consumo FIFO y CRUD de categorías.
+3. **Ventas**: carrito de compra con descuentos (por producto o globales, en % o $), pagos en efectivo / punto de venta / pago móvil y emisión automática de la **nota de entrega en PDF** como comprobante de la venta (numeración correlativa global única). Incluye el historial de notas de entrega con filtros y exportación a Excel.
+4. **Clientes**: CRUD con validación de cédula duplicada y de teléfono.
+5. **Usuarios**: gestión de usuarios, roles y permisos por módulo.
+6. **Historial (bitácora)**: registro automático de eventos críticos del sistema.
+7. **Reportes gerenciales**: tarjetas KPI, gráficos de barras y exportación a Excel.
+8. **Copias de seguridad**: exportación y restauración de la base de datos (`.sql`).
+
+> **Importante**: el sistema **no emite facturas ni tiene módulo de facturación**. El comprobante de cada venta es la **nota de entrega**, generada dentro del módulo **Ventas**; su historial (con reimpresión y descarga) es una funcionalidad de ese mismo módulo, no un módulo independiente.
+
 ## Funcionalidades
 
 **Acceso y seguridad**
@@ -28,7 +43,7 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 - Métodos de pago: Efectivo ($), Punto de Venta y Pago Móvil.
 - Emisión de **nota de entrega en PDF** con número de control correlativo global (por ejemplo `0009`), único e irrepetible.
 
-**Notas de entrega**
+**Historial de notas de entrega (dentro del módulo Ventas)**
 - Historial de ventas con búsqueda por cédula del cliente y **filtro por período** (Todas, Hoy, Última Semana, Último Mes, Último Año) combinable con la cédula, con resumen de notas y total del período filtrado, y botón **"Limpiar Filtros"**.
 - Ver detalles de productos, **reimprimir** PDF y **descargar el PDF** a una ruta elegida.
 - **Exportar a Excel** (`.xlsx`) de las ventas listadas (respeta el filtro aplicado).
