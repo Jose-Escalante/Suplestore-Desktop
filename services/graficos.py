@@ -38,25 +38,18 @@ def _etiqueta_dia(valor):
     return str(valor)
 
 
-def _vertical(filas, key_x, key_y, titulo, periodo_label=""):
+def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, rotacion=0):
     fig, ax = _base(f"{titulo} - {periodo_label}".strip(" -") if periodo_label else titulo)
     ax.grid(axis="x", color="none")
-    ax.bar([_etiqueta_dia(f[key_x]) for f in filas],
-           [float(f[key_y]) for f in filas],
-           color=VERDE, width=0.55)
-    ax.yaxis.set_major_formatter(FuncFormatter(_dolar))
+    etiquetas = [_etiqueta_dia(f[key_x]) for f in filas]
+    if rotacion:
+        etiquetas = [e[:18] for e in etiquetas]
+    ax.bar(etiquetas, [float(f[key_y]) for f in filas], color=VERDE, width=0.55)
+    if es_dinero:
+        ax.yaxis.set_major_formatter(FuncFormatter(_dolar))
+    if rotacion:
+        ax.tick_params(axis="x", rotation=rotacion)
     ax.margins(y=0.15)
-    return fig
-
-
-def _horizontal(filas, key_etiqueta, key_valor, titulo, dinero=False):
-    fig, ax = _base(titulo)
-    etiquetas = [str(f[key_etiqueta]) for f in filas][::-1]
-    valores = [float(f[key_valor]) for f in filas][::-1]
-    ax.barh(etiquetas, valores, color=VERDE, height=0.6)
-    if dinero:
-        ax.xaxis.set_major_formatter(FuncFormatter(_dolar))
-    ax.margins(x=0.12)
     return fig
 
 
@@ -72,13 +65,13 @@ def crear_grafico(tipo, filas, periodo_label=""):
     if not GRAFICOS_OK or not filas or tipo not in TIPOS_CON_GRAFICO:
         return None
     if tipo == "Ventas por Periodo":
-        return _vertical(filas, "dia", "total", "Ventas por Dia", periodo_label)
+        return _vertical(filas, "dia", "total", "Ventas por Dia", periodo_label, es_dinero=True)
     if tipo == "Productos mas Vendidos":
-        return _horizontal(filas, "nombre_producto", "unidades", "Unidades Vendidas por Producto")
+        return _vertical(filas, "nombre_producto", "unidades", "Unidades Vendidas por Producto", rotacion=30)
     if tipo == "Ventas por Metodo de Pago":
-        return _horizontal(filas, "metodo_pago", "total", "Ventas por Metodo de Pago", dinero=True)
+        return _vertical(filas, "metodo_pago", "total", "Ventas por Metodo de Pago", es_dinero=True, rotacion=30)
     if tipo == "Productos con Stock Bajo":
-        return _horizontal(filas, "nombre_producto", "stock_total", "Stock Disponible")
+        return _vertical(filas, "nombre_producto", "stock_total", "Stock Disponible", rotacion=30)
     return None
 
 
