@@ -249,17 +249,16 @@ INSERT INTO `notas_entrega`
    `porcentaje_descuento`, `metodo_pago`, `monto_cancelado`)
 VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
 
--- 6.3.2. Por CADA item del carrito: seleccionar los lotes con stock del
---        producto, ORDENADOS POR FECHA DE VENCIMIENTO ASCENDENTE.
---        Es la logica FIFO por vencimiento: se descuenta primero del lote
---        que vence primero (reduciendo mermas por caducidad).
+-- 6.3.2. Por CADA item del carrito: seleccionar el LOTE ACTIVO con stock del
+--        producto (regla de negocio: un solo lote activo por producto).
+--        El ORDER BY queda como resguardo; en la practica solo hay un lote.
 SELECT `id_lote`, `stock`
 FROM `lotes`
 WHERE `id_producto` = %s AND `estado` = 'Activo' AND `stock` > 0
 ORDER BY `fecha_vencimiento` ASC;
 
--- 6.3.3. Si el lote se agota con esta venta: stock en 0 y estado Agotado.
-UPDATE `lotes` SET `stock` = 0, `estado` = 'Agotado' WHERE `id_lote` = %s;
+-- 6.3.3. Si el lote se agota con esta venta: stock en 0 y estado Inactivo.
+UPDATE `lotes` SET `stock` = 0, `estado` = 'Inactivo' WHERE `id_lote` = %s;
 
 -- 6.3.4. Si el lote aun queda stock: solo se actualiza la cantidad.
 UPDATE `lotes` SET `stock` = %s WHERE `id_lote` = %s;

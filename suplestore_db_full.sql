@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `lotes` (
   `costo`             DECIMAL(10,2) NOT NULL,
   `precio`            DECIMAL(10,2) NOT NULL,
   `fecha_vencimiento` DATE          NOT NULL,
-  `estado`            ENUM('Activo','Agotado','Inactivo') COLLATE utf8mb4_spanish_ci DEFAULT 'Activo',
+  `estado`            ENUM('Activo','Inactivo') COLLATE utf8mb4_spanish_ci DEFAULT 'Activo',
   PRIMARY KEY (`id_lote`),
   KEY `id_producto` (`id_producto`),
   CONSTRAINT `lotes_ibfk_1` FOREIGN KEY (`id_producto`)

@@ -38,6 +38,8 @@ class ProductModel:
             if (self.db.cursor.fetchone()["total"] or 0) > 0:
                 self.db.rollback()
                 raise Exception("El producto aun tiene stock en su lote activo. Agotelo antes de registrar un nuevo lote.")
+            q_inactivo = "UPDATE lotes SET estado = 'Inactivo' WHERE id_producto = %s AND estado = 'Activo'"
+            self.db.cursor.execute(q_inactivo, (id_producto,))
             q_lote = "INSERT INTO lotes (id_producto, stock, costo, precio, fecha_vencimiento, estado) VALUES (%s, %s, %s, %s, %s, 'Activo')"
             self.db.cursor.execute(q_lote, (id_producto, stock, costo, precio, vencimiento))
             self.db.commit()
