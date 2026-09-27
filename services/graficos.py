@@ -7,9 +7,13 @@ try:
 except Exception:
     GRAFICOS_OK = False
 
+from datetime import date
+
 BG = "#3B3B3B"
 FG = "#EEEEEE"
 VERDE = "#5CB85C"
+NARANJA = "#E0A800"
+GRIS = "#CCCCCC"
 ANCHO = 6.2
 ALTO = 2.2
 
@@ -38,13 +42,15 @@ def _etiqueta_dia(valor):
     return str(valor)
 
 
-def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, rotacion=0):
+def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, rotacion=0, alerta_dias=False):
     fig, ax = _base(f"{titulo} - {periodo_label}".strip(" -") if periodo_label else titulo)
     ax.grid(axis="x", color="none")
     etiquetas = [_etiqueta_dia(f[key_x]) for f in filas]
     if rotacion:
-        etiquetas = [e[:18] for e in etiquetas]
-    ax.bar(etiquetas, [float(f[key_y]) for f in filas], color=VERDE, width=0.35)
+        etiquetas = [e[:24] for e in etiquetas]
+    valores = [float(f[key_y]) for f in filas]
+    colores = [NARANJA if v <= 30 else VERDE for v in valores] if alerta_dias else VERDE
+    ax.bar(etiquetas, valores, color=colores, width=0.35)
     if es_dinero:
         ax.yaxis.set_major_formatter(FuncFormatter(_dolar))
     if rotacion:
@@ -53,11 +59,43 @@ def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, ro
     return fig
 
 
+def _descuentos(filas):
+    f = filas[0]
+    con = int(f["notas_con_descuento"])
+    sin = int(f["notas"]) - con
+    fig, ax = _base("Notas con Descuento")
+    ax.grid(axis="x", color="none")
+    ax.bar(["Con descuento", "Sin descuento"], [con, sin], color=[VERDE, GRIS], width=0.35)
+    ax.margins(y=0.15)
+    return fig
+
+
+def _inactivos(filas):
+    hoy = date.today()
+    datos = []
+    for f in filas:
+        ultima = f.get("ultima_venta")
+        if ultima:
+            if hasattr(ultima, "date"):
+                ultima = ultima.date()
+            dias = (hoy - ultima).days
+            datos.append({"nombre": f["nombre"], "dias": dias})
+    if not datos:
+        return None
+    return _vertical(datos, "nombre", "dias", "Dias Sin Comprar", rotacion=30)
+
+
 TIPOS_CON_GRAFICO = {
     "Ventas por Periodo",
     "Productos mas Vendidos",
+    "Productos menos Vendidos",
+    "Ventas por Cliente",
+    "Ventas por Vendedor",
     "Ventas por Metodo de Pago",
+    "Descuentos Aplicados",
     "Productos con Stock Bajo",
+    "Clientes Inactivos",
+    "Vencimientos de Lotes",
 }
 
 
@@ -68,10 +106,26 @@ def crear_grafico(tipo, filas, periodo_label=""):
         return _vertical(filas, "dia", "total", "Ventas por Dia", periodo_label, es_dinero=True)
     if tipo == "Productos mas Vendidos":
         return _vertical(filas, "nombre_producto", "unidades", "Unidades Vendidas por Producto", rotacion=30)
+    if tipo == "Productos menos Vendidos":
+        return _vertical(filas, "nombre_producto", "unidades", "Unidades por Producto", rotacion=30)
+    if tipo == "Ventas por Cliente":
+        return _vertical(filas, "nombre", "total", "Ventas por Cliente", es_dinero=True, rotacion=30)
+    if tipo == "Ventas por Vendedor":
+        return _vertical(filas, "usuario", "total", "Ventas por Vendedor", es_dinero=True, rotacion=30)
     if tipo == "Ventas por Metodo de Pago":
         return _vertical(filas, "metodo_pago", "total", "Ventas por Metodo de Pago", es_dinero=True, rotacion=30)
+    if tipo == "Descuentos Aplicados":
+        return _descuentos(filas)
     if tipo == "Productos con Stock Bajo":
         return _vertical(filas, "nombre_producto", "stock_total", "Stock Disponible", rotacion=30)
+    if tipo == "Clientes Inactivos":
+        return _inactivos(filas)
+    if tipo == "Vencimientos de Lotes":
+        filas_aux = [
+            {**f, "etiqueta": f"{f['nombre_producto']} (L{f['lote']})"}
+            for f in filas
+        ]
+        return _vertical(filas_aux, "etiqueta", "dias", "Dias Restantes para Vencer", rotacion=30, alerta_dias=True)
     return None
 
 
