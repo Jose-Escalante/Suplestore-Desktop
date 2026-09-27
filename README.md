@@ -41,7 +41,7 @@ El sistema consta de **ocho módulos de trabajo** interconectados y gobernados p
 - Carrito de compras con agregar/editar/eliminar productos y validación de stock.
 - **Descuento por producto** (% o $) y **descuento global** (% o $) en el pago.
 - Métodos de pago: Efectivo ($), Punto de Venta y Pago Móvil.
-- Emisión de **nota de entrega en PDF** con número de control correlativo global (por ejemplo `0009`), único e irrepetible.
+- Emisión de **nota de entrega en PDF** con número de control correlativo global (por ejemplo `0050`), único e irrepetible.
 
 **Historial de notas de entrega (dentro del módulo Ventas)**
 - Historial de ventas con búsqueda por cédula del cliente y **filtro por período** (Todas, Hoy, Última Semana, Último Mes, Último Año) combinable con la cédula, con resumen de notas y total del período filtrado, y botón **"Limpiar Filtros"**.
