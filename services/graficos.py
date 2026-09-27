@@ -51,6 +51,8 @@ def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, ro
     valores = [float(f[key_y]) for f in filas]
     colores = [NARANJA if v <= 30 else VERDE for v in valores] if alerta_dias else VERDE
     ax.bar(etiquetas, valores, color=colores, width=0.35)
+    if len(valores) == 1:
+        ax.set_xlim(-1.75, 1.75)
     if es_dinero:
         ax.yaxis.set_major_formatter(FuncFormatter(_dolar))
     else:
@@ -95,6 +97,8 @@ def _inactivos(filas):
     fig, ax = _base("Dias Sin Comprar")
     ax.grid(axis="x", color="none")
     ax.bar(etiquetas, valores, color=colores, width=0.35)
+    if len(valores) == 1:
+        ax.set_xlim(-1.75, 1.75)
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax.tick_params(axis="x", rotation=30)
     ax.margins(y=0.15)
