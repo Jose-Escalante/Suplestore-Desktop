@@ -33,13 +33,16 @@ class ProductModel:
 
     def agregar_lote_a_producto(self, id_producto, stock, costo, precio, vencimiento):
         try:
-            q_inactivo = "UPDATE lotes SET estado = 'Inactivo' WHERE id_producto = %s AND estado <> 'Inactivo'"
-            self.db.cursor.execute(q_inactivo, (id_producto,))
+            q_check = "SELECT COUNT(*) AS total FROM lotes WHERE id_producto = %s AND stock > 0"
+            self.db.cursor.execute(q_check, (id_producto,))
+            if (self.db.cursor.fetchone()["total"] or 0) > 0:
+                self.db.rollback()
+                raise Exception("El producto aun tiene stock en su lote activo. Agotelo antes de registrar un nuevo lote.")
             q_lote = "INSERT INTO lotes (id_producto, stock, costo, precio, fecha_vencimiento, estado) VALUES (%s, %s, %s, %s, %s, 'Activo')"
             self.db.cursor.execute(q_lote, (id_producto, stock, costo, precio, vencimiento))
             self.db.commit()
             return True
-        except mysql.connector.Error as err:
+        except Exception as err:
             self.db.rollback()
             messagebox.showerror("Error", f"No se pudo agregar el lote:\n{err}")
             return False

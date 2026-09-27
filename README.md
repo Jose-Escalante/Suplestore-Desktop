@@ -9,7 +9,7 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 El sistema consta de **ocho módulos de trabajo** interconectados y gobernados por un esquema de permisos por rol (Administrador o Vendedor):
 
 1. **Inicio de sesión y seguridad**: acceso con contraseñas cifradas (bcrypt), bloqueo temporal de 5 minutos tras 5 intentos fallidos, cambio obligatorio de contraseña en el primer ingreso y aviso de lotes próximos a vencer (< 90 días).
-2. **Inventario y categorías**: catálogo de productos por lotes con consumo FIFO y CRUD de categorías.
+2. **Inventario y categorías**: catálogo de productos por lotes con **un solo lote activo por producto** y CRUD de categorías.
 3. **Ventas**: carrito de compra con descuentos (por producto o globales, en % o $), pagos en efectivo / punto de venta / pago móvil y emisión automática de la **nota de entrega en PDF** como comprobante de la venta (numeración correlativa global única). Incluye el historial de notas de entrega con filtros y exportación a Excel.
 4. **Clientes**: CRUD con validación de cédula duplicada y de teléfono.
 5. **Usuarios**: gestión de usuarios, roles y permisos por módulo.
@@ -34,7 +34,7 @@ El sistema consta de **ocho módulos de trabajo** interconectados y gobernados p
 
 **Inventario**
 - Gestión de productos y lotes: stock, costos, precios y fechas de vencimiento.
-- Consumo de stock por lotes en orden FIFO.
+- Consumo de stock del **lote activo** (un solo lote activo por producto); el lote agotado pasa a estado `Agotado` y solo entonces se puede registrar un lote nuevo.
 - **Aviso de productos sin stock**: se muestran en rojo y con contador en el inventario; en ventas no permite venderlos.
 
 **Ventas**
