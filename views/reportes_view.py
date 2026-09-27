@@ -132,8 +132,7 @@ class ReportesView:
         if tipo in self.tipos_con_dias:
             if tipo == "Vencimientos de Lotes":
                 self.combo_dias.configure(values=OPCIONES_DIAS)
-                if self.combo_dias.get() not in OPCIONES_DIAS:
-                    self.combo_dias.set("90 dias")
+                self.combo_dias.set("Todos")
             else:
                 self.combo_dias.configure(values=OPCIONES_DIAS[:-1])
                 if self.combo_dias.get() == "Todos":

@@ -480,15 +480,15 @@ HAVING MAX(n.fecha_hora) IS NULL
     OR MAX(n.fecha_hora) < DATE_SUB(NOW(), INTERVAL %s DAY)
 ORDER BY `ultima_venta` ASC;
 
--- 9.11. Vencimientos de lotes: todos los lotes activos con stock, en un
---       solo lugar, ordenados del que vence primero (o todos).
+-- 9.11. Vencimientos de lotes: por defecto muestra TODOS los lotes activos
+--       con stock, ordenados del que vence primero. El filtro opcional de
+--       dias (30/60/90) agrega BETWEEN 0 AND %s para acotar el rango.
 SELECT p.nombre_producto, l.id_lote AS `lote`, l.stock,
        l.fecha_vencimiento AS `vencimiento`,
        (TO_DAYS(l.fecha_vencimiento) - TO_DAYS(CURDATE())) AS `dias`
 FROM `lotes` l
 JOIN `productos` p ON l.id_producto = p.id_producto
 WHERE l.estado = 'Activo' AND l.stock > 0
-  AND (TO_DAYS(l.fecha_vencimiento) - TO_DAYS(CURDATE())) BETWEEN 0 AND %s
 ORDER BY l.fecha_vencimiento ASC;
 
 
