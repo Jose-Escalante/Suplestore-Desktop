@@ -44,7 +44,7 @@ def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, ro
     etiquetas = [_etiqueta_dia(f[key_x]) for f in filas]
     if rotacion:
         etiquetas = [e[:18] for e in etiquetas]
-    ax.bar(etiquetas, [float(f[key_y]) for f in filas], color=VERDE, width=0.55)
+    ax.bar(etiquetas, [float(f[key_y]) for f in filas], color=VERDE, width=0.35)
     if es_dinero:
         ax.yaxis.set_major_formatter(FuncFormatter(_dolar))
     if rotacion:
