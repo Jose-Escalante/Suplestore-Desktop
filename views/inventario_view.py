@@ -80,12 +80,13 @@ class InventarioView:
         self.entry_search.pack(side="left", padx=(0, 5))
         self.entry_search.bind("<Return>", lambda e: self.buscar())
 
-        self.lbl_sin_stock = ctk.CTkLabel(search_frame, text="", text_color="#FF5555", font=("Arial", 10, "bold"))
-        self.lbl_sin_stock.pack(side="left", padx=(10, 0))
-
         ctk.CTkButton(search_frame, text="Buscar", fg_color="#5CB85C", text_color="#000000",
                       font=("Arial", 10, "bold"), width=70, height=32, corner_radius=6,
                       command=self.buscar).pack(side="left")
+
+        self.lbl_sin_stock = ctk.CTkLabel(search_frame, text="", text_color="#FF5555",
+                                          font=("Arial", 10, "bold"), height=32)
+        self.lbl_sin_stock.pack(side="left", padx=(12, 0))
 
         table_frame = ctk.CTkFrame(right_panel, fg_color="#777777", corner_radius=8)
         table_frame.pack(fill="both", expand=True)
@@ -122,7 +123,7 @@ class InventarioView:
             stock = int(item["Stock"]) if str(item["Stock"]).isdigit() else 0
             if stock <= 0:
                 sin_stock += 1
-                self.tree.insert("", "end", values=(item["id"], item["Producto"], item["Categoria"], item["Stock"]),
+                self.tree.insert("", "end", values=(item["id"], item["Producto"], item["Categoria"], "Agotado"),
                                  tags=("sin_stock",))
             else:
                 self.tree.insert("", "end", values=(item["id"], item["Producto"], item["Categoria"], item["Stock"]))

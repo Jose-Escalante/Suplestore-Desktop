@@ -59,17 +59,13 @@ class SaleModel:
                     if stock_lote >= pendiente_por_descontar:
                         cant_usada = pendiente_por_descontar
                         nuevo_stock = stock_lote - cant_usada
-                        if nuevo_stock == 0:
-                            q_upd = "UPDATE lotes SET stock = 0, estado = 'Inactivo' WHERE id_lote = %s"
-                            self.db.cursor.execute(q_upd, (id_lote,))
-                        else:
-                            q_upd = "UPDATE lotes SET stock = %s WHERE id_lote = %s"
-                            self.db.cursor.execute(q_upd, (nuevo_stock, id_lote))
+                        q_upd = "UPDATE lotes SET stock = %s WHERE id_lote = %s"
+                        self.db.cursor.execute(q_upd, (nuevo_stock, id_lote))
                         pendiente_por_descontar = 0
                     else:
                         cant_usada = stock_lote
                         pendiente_por_descontar -= stock_lote
-                        q_upd = "UPDATE lotes SET stock = 0, estado = 'Inactivo' WHERE id_lote = %s"
+                        q_upd = "UPDATE lotes SET stock = 0 WHERE id_lote = %s"
                         self.db.cursor.execute(q_upd, (id_lote,))
                     if desc_item > 0 and pendiente_por_descontar > 0:
                         desc_linea = round(desc_item * cant_usada / cantidad_comprada, 2)

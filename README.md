@@ -34,7 +34,7 @@ El sistema consta de **ocho módulos de trabajo** interconectados y gobernados p
 
 **Inventario**
 - Gestión de productos y lotes: stock, costos, precios y fechas de vencimiento.
-- Consumo de stock del **lote activo** (un solo lote activo por producto); al agotarse se registra el lote siguiente con **Actualizar Lote**: el anterior pasa a `Inactivo` y el nuevo a `Activo`.
+- Consumo de stock del **lote activo** (un solo lote activo por producto); al agotarse, el producto se muestra como **Agotado** en la tabla (stock 0) y el lote conserva su estado `Activo`. Recién al registrar el lote siguiente con **Actualizar Lote**, el anterior pasa a `Inactivo` y el nuevo a `Activo`.
 - **Aviso de productos sin stock**: se muestran en rojo y con contador en el inventario; en ventas no permite venderlos.
 
 **Ventas**

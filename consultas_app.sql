@@ -257,8 +257,10 @@ FROM `lotes`
 WHERE `id_producto` = %s AND `estado` = 'Activo' AND `stock` > 0
 ORDER BY `fecha_vencimiento` ASC;
 
--- 6.3.3. Si el lote se agota con esta venta: stock en 0 y estado Inactivo.
-UPDATE `lotes` SET `stock` = 0, `estado` = 'Inactivo' WHERE `id_lote` = %s;
+-- 6.3.3. Si el lote se agota con esta venta: el stock pasa a 0 y el estado
+--        NO cambia (sigue 'Activo'); recien al registrar un lote nuevo con
+--        "Actualizar Lote" (modulo Inventario) el anterior pasa a 'Inactivo'.
+UPDATE `lotes` SET `stock` = 0 WHERE `id_lote` = %s;
 
 -- 6.3.4. Si el lote aun queda stock: solo se actualiza la cantidad.
 UPDATE `lotes` SET `stock` = %s WHERE `id_lote` = %s;
