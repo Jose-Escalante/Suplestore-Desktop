@@ -62,19 +62,22 @@ def _horizontal(filas, key_etiqueta, key_valor, titulo, dinero=False, verdes_por
     return fig
 
 
+TIPOS_CON_GRAFICO = {
+    "Ventas por Periodo",
+    "Productos mas Vendidos",
+    "Ventas por Metodo de Pago",
+    "Productos con Stock Bajo",
+    "Vencimientos de Lotes",
+}
+
+
 def crear_grafico(tipo, filas):
-    if not GRAFICOS_OK or not filas:
-        return None
-    if tipo == "Descuentos Aplicados" or tipo == "Clientes Inactivos":
+    if not GRAFICOS_OK or not filas or tipo not in TIPOS_CON_GRAFICO:
         return None
     if tipo == "Ventas por Periodo":
         return _vertical(filas, "dia", "total", "Ventas por Dia")
-    if tipo in ("Productos mas Vendidos", "Productos menos Vendidos"):
+    if tipo == "Productos mas Vendidos":
         return _horizontal(filas, "nombre_producto", "unidades", "Unidades Vendidas por Producto")
-    if tipo == "Ventas por Cliente":
-        return _horizontal(filas, "nombre", "total", "Ventas por Cliente", dinero=True)
-    if tipo == "Ventas por Vendedor":
-        return _horizontal(filas, "usuario", "total", "Ventas por Vendedor", dinero=True)
     if tipo == "Ventas por Metodo de Pago":
         return _horizontal(filas, "metodo_pago", "total", "Ventas por Metodo de Pago", dinero=True)
     if tipo == "Productos con Stock Bajo":
