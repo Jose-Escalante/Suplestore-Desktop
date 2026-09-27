@@ -160,6 +160,14 @@ class ClientesView:
         self.e_telefono.delete(0, ctk.END)
         self._id_seleccionado = None
 
+    def _validar_telefono(self, telefono):
+        if not telefono:
+            return True
+        if len(telefono) != 11 or not telefono.startswith("04") or not telefono.isdigit():
+            messagebox.showwarning("Telefono invalido", "El telefono debe tener 11 digitos y comenzar con 04 (ej: 04121234567)")
+            return False
+        return True
+
     def ingresar_cliente(self):
         nombre = self.e_nombre.get().strip()
         apellido = self.e_apellido.get().strip()
@@ -170,6 +178,8 @@ class ClientesView:
             return
         if not (7 <= len(cedula) <= 8):
             messagebox.showwarning("Cedula invalida", "La cedula debe tener entre 7 y 8 digitos")
+            return
+        if not self._validar_telefono(telefono):
             return
         if self.controller.model.agregar_cliente(nombre, apellido, cedula, telefono):
             messagebox.showinfo("Exito", "Cliente registrado correctamente")
@@ -189,6 +199,8 @@ class ClientesView:
             return
         if not (7 <= len(cedula) <= 8):
             messagebox.showwarning("Cedula invalida", "La cedula debe tener entre 7 y 8 digitos")
+            return
+        if not self._validar_telefono(telefono):
             return
         if self.controller.model.actualizar_cliente(self._id_seleccionado, nombre, apellido, cedula, telefono):
             messagebox.showinfo("Exito", "Cliente actualizado correctamente")
