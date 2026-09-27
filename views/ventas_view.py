@@ -2,7 +2,7 @@ import os
 import customtkinter as ctk
 from tkinter import filedialog, messagebox, ttk
 from PIL import Image
-from datetime import datetime
+from datetime import datetime, timedelta
 from services.nota_entrega import generar_nota_entrega
 from services.excel_export import exportar_ventas_xlsx
 from services.ui_utils import traer_al_frente
@@ -599,8 +599,18 @@ class VentasView:
         search_row = ctk.CTkFrame(modal, fg_color="#333333")
         search_row.pack(fill="x", padx=15, pady=(0, 5))
         ctk.CTkLabel(search_row, text="Cedula:", text_color="#FFFFFF", font=("Arial", 11)).pack(side="left", padx=(0, 5))
-        entry_cedula = ctk.CTkEntry(search_row, font=("Arial", 11), width=180)
-        entry_cedula.pack(side="left", padx=(0, 5))
+        entry_cedula = ctk.CTkEntry(search_row, font=("Arial", 11), width=160)
+        entry_cedula.pack(side="left", padx=(0, 8))
+
+        ctk.CTkLabel(search_row, text="Periodo:", text_color="#FFFFFF", font=("Arial", 11)).pack(side="left", padx=(0, 5))
+        combo_periodo = ctk.CTkComboBox(search_row,
+                                        values=["Todas", "Hoy", "Ultima Semana", "Ultimo Mes", "Ultimo Ano"],
+                                        width=140, font=("Arial", 11), command=lambda _sel: _aplicar_filtros())
+        combo_periodo.set("Todas")
+        combo_periodo.pack(side="left", padx=(0, 8))
+
+        lbl_resumen = ctk.CTkLabel(search_row, text="", text_color="#FFFFFF", font=("Arial", 11, "bold"))
+        lbl_resumen.pack(side="right", padx=15)
         lbl_consulta = ctk.CTkLabel(search_row, text="", text_color="#5CB85C", font=("Arial", 11, "bold"))
         lbl_consulta.pack(side="left", padx=15)
 
@@ -635,25 +645,41 @@ class VentasView:
 
         ventas_completas = self.controller.model.obtener_historial_ventas()
 
-        def _filtrar_por_cedula(event=None):
+        def _aplicar_filtros(event=None):
+            ahora = datetime.now()
+            opcion = combo_periodo.get()
+            inicio = None
+            if opcion == "Hoy":
+                inicio = ahora.replace(hour=0, minute=0, second=0, microsecond=0)
+            elif opcion == "Ultima Semana":
+                inicio = ahora - timedelta(days=6)
+            elif opcion == "Ultimo Mes":
+                inicio = ahora - timedelta(days=29)
+            elif opcion == "Ultimo Ano":
+                inicio = ahora - timedelta(days=364)
+            filtradas = ventas_completas
+            if inicio is not None:
+                filtradas = [v for v in ventas_completas if v.get("fecha") and v["fecha"] >= inicio]
             cedula = entry_cedula.get().strip()
             if cedula:
-                filtradas = [v for v in ventas_completas if str(v.get("cedula", "")).startswith(cedula)]
+                filtradas = [v for v in filtradas if str(v.get("cedula", "")).startswith(cedula)]
                 nombres = {v["cliente"] for v in filtradas}
                 lbl_consulta.configure(text=f"Cliente: {', '.join(sorted(nombres))}" if nombres else "Sin resultados")
             else:
-                filtradas = ventas_completas
                 lbl_consulta.configure(text="")
             _poblar(tree, filtradas)
+            total = sum(float(v["total"]) for v in filtradas)
+            lbl_resumen.configure(text=f"{len(filtradas)} notas | Total: ${total:.2f}")
 
-        entry_cedula.bind("<KeyRelease>", _filtrar_por_cedula)
+        entry_cedula.bind("<KeyRelease>", _aplicar_filtros)
 
         def ver_todos():
+            combo_periodo.set("Todas")
             entry_cedula.delete(0, "end")
-            _filtrar_por_cedula()
+            _aplicar_filtros()
 
-        ctk.CTkButton(search_row, text="Ver Todos", fg_color="#5CB85C", text_color="#000000",
-                      font=("Arial", 10, "bold"), width=90, height=28, corner_radius=6,
+        ctk.CTkButton(search_row, text="Limpiar Filtros", fg_color="#5CB85C", text_color="#000000",
+                      font=("Arial", 10, "bold"), width=110, height=28, corner_radius=6,
                       command=ver_todos).pack(side="left", padx=5)
 
         frame_t = ctk.CTkFrame(modal, fg_color="transparent")
@@ -669,7 +695,7 @@ class VentasView:
             tree.column(col, width=w, anchor="center")
         tree.pack(fill="both", expand=True)
 
-        _poblar(tree, ventas_completas)
+        _aplicar_filtros()
         tree.focus_set()
 
         def _marcar_fila(event):
