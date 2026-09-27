@@ -181,6 +181,9 @@ class ClientesView:
             return
         if not self._validar_telefono(telefono):
             return
+        if self.controller.model.buscar_cliente_por_cedula(cedula):
+            messagebox.showwarning("Cedula duplicada", "La cedula ya esta registrada para otro cliente. Para modificarla use el boton Modificar.")
+            return
         if self.controller.model.agregar_cliente(nombre, apellido, cedula, telefono):
             messagebox.showinfo("Exito", "Cliente registrado correctamente")
             self._limpiar_formulario()
@@ -201,6 +204,10 @@ class ClientesView:
             messagebox.showwarning("Cedula invalida", "La cedula debe tener entre 7 y 8 digitos")
             return
         if not self._validar_telefono(telefono):
+            return
+        existente = self.controller.model.buscar_cliente_por_cedula(cedula)
+        if existente and str(existente["id_cliente"]) != str(self._id_seleccionado):
+            messagebox.showwarning("Cedula duplicada", "La cedula ya esta registrada para otro cliente.")
             return
         if self.controller.model.actualizar_cliente(self._id_seleccionado, nombre, apellido, cedula, telefono):
             messagebox.showinfo("Exito", "Cliente actualizado correctamente")
