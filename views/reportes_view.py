@@ -1,5 +1,5 @@
 from datetime import datetime
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, font as tkfont, messagebox, ttk
 
 import customtkinter as ctk
 
@@ -35,6 +35,11 @@ class ReportesView:
         self._mostrar = []
         self._exportar = []
         self._crudas = []
+        self._kpis = []
+        self._chart_ancho = 620
+        self._chart_render_ancho = 0
+        self._resize_after = None
+        self._kpi_resize_after = None
 
         top_bar = ctk.CTkFrame(self.root, fg_color="#5CB85C", height=30)
         top_bar.pack(fill="x", side="top")
@@ -57,7 +62,9 @@ class ReportesView:
             tarjeta.pack(side="left", padx=4, fill="x", expand=True)
             tarjeta.pack_propagate(False)
             ctk.CTkLabel(tarjeta, text=titulo, text_color="#111111", font=("Arial", 10, "bold")).pack(anchor="w", padx=10, pady=(5, 0))
-            ctk.CTkLabel(tarjeta, text=valor, text_color="#111111", font=("Arial", 16, "bold")).pack(anchor="w", padx=10)
+            label_valor = ctk.CTkLabel(tarjeta, text=valor, text_color="#111111", font=("Arial", 16, "bold"))
+            label_valor.pack(anchor="w", padx=10)
+            self._kpis.append((tarjeta, label_valor))
 
         body = ctk.CTkFrame(container, fg_color="#3B3B3B")
         body.pack(fill="both", expand=True)
@@ -68,22 +75,19 @@ class ReportesView:
         self.chart_frame = ctk.CTkFrame(columna, fg_color="#3B3B3B", height=230)
         self.chart_frame.pack(fill="x", pady=(0, 10))
         self.chart_frame.pack_propagate(False)
+        self.chart_frame.bind("<Configure>", self._en_chart_resize)
 
         table_frame = ctk.CTkFrame(columna, fg_color="#777777", corner_radius=8)
         table_frame.pack(fill="both", expand=True)
 
         scrollbar = ttk.Scrollbar(table_frame, orient="vertical")
         scrollbar.pack(side="right", fill="y")
-        try:
-            estilo = ttk.Style(controller.root)
-            estilo.configure("Reportes.Treeview", font=("Arial", 13), rowheight=30)
-            estilo.configure("Reportes.Treeview.Heading", font=("Arial", 13, "bold"))
-            estilo_tree = "Reportes.Treeview"
-        except Exception:
-            estilo_tree = "default"
-        self.tree = ttk.Treeview(table_frame, style=estilo_tree, show="headings", yscrollcommand=scrollbar.set)
-        scrollbar.config(command=self.tree.yview)
-        self.tree.pack(fill="both", expand=True, padx=10, pady=10)
+        scrollbar_h = ttk.Scrollbar(table_frame, orient="horizontal")
+        scrollbar_h.pack(side="bottom", fill="x")
+        self.table_frame = table_frame
+        self.scrollbar = scrollbar
+        self.scrollbar_h = scrollbar_h
+        self._reconstruir_arbol()
 
         sidebar = ctk.CTkFrame(body, fg_color="#3B3B3B", width=210)
         sidebar.pack(side="right", fill="y", padx=(12, 0))
@@ -113,6 +117,8 @@ class ReportesView:
         ctk.CTkButton(sidebar, text="Volver", fg_color="#E0E0E0", text_color="#000000", font=("Arial", 12, "bold"),
                       width=170, height=34, command=controller.show_panel).pack(pady=(16, 0))
 
+        kpi_frame.bind("<Configure>", self._en_kpi_resize)
+        self._ajustar_kpis()
         self._actualizar_controles()
         self.cargar()
 
@@ -143,16 +149,97 @@ class ReportesView:
             self.lbl_dias.pack_forget()
             self.combo_dias.pack_forget()
 
+    def _en_chart_resize(self, _evento):
+        if self._resize_after:
+            try:
+                self.root.after_cancel(self._resize_after)
+            except Exception:
+                pass
+        self._resize_after = self.root.after(120, self._re_render_grafico)
+
+    def _re_render_grafico(self):
+        self._resize_after = None
+        try:
+            if not self.chart_frame.winfo_exists():
+                return
+        except Exception:
+            return
+        objetivo = max(self._chart_ancho, 300)
+        if not self._crudas or objetivo == self._chart_render_ancho:
+            return
+        self._render_grafico(self.combo_tipo.get())
+
+    def _en_kpi_resize(self, _evento):
+        if self._kpi_resize_after:
+            try:
+                self.root.after_cancel(self._kpi_resize_after)
+            except Exception:
+                pass
+        self._kpi_resize_after = self.root.after(120, self._ajustar_kpis)
+
+    def _ajustar_kpis(self):
+        self._kpi_resize_after = None
+        try:
+            self.root.update_idletasks()
+        except Exception:
+            return
+        for tarjeta, label in self._kpis:
+            try:
+                ancho = max(tarjeta.winfo_width() - 26, 60)
+                texto = label.cget("text")
+                tamano = 16
+                for propuesto in range(16, 7, -1):
+                    fuente = tkfont.Font(family="Arial", size=propuesto, weight="bold")
+                    if fuente.measure(texto) <= ancho:
+                        tamano = propuesto
+                        break
+                label.configure(font=("Arial", tamano, "bold"))
+            except Exception:
+                continue
+
+    def _ancho_columnas(self):
+        fuente = tkfont.Font(family="Arial", size=13)
+        anchos = []
+        for i, head in enumerate(self._headers):
+            max_px = fuente.measure(head)
+            for fila in self._mostrar:
+                if i < len(fila):
+                    max_px = max(max_px, fuente.measure(str(fila[i])))
+            anchos.append(min(280, max(90, max_px + 26)))
+        return anchos
+
+    def _reconstruir_arbol(self):
+        arbol = getattr(self, "tree", None)
+        if arbol is not None:
+            try:
+                if arbol.winfo_exists():
+                    arbol.destroy()
+            except Exception:
+                pass
+        try:
+            estilo = ttk.Style(self.root)
+            estilo.configure("Reportes.Treeview", font=("Arial", 13), rowheight=30)
+            estilo.configure("Reportes.Treeview.Heading", font=("Arial", 13, "bold"))
+            estilo_tree = "Reportes.Treeview"
+        except Exception:
+            estilo_tree = "default"
+        self.tree = ttk.Treeview(self.table_frame, style=estilo_tree, show="headings",
+                                 yscrollcommand=self.scrollbar.set, xscrollcommand=self.scrollbar_h.set)
+        self.scrollbar.config(command=self.tree.yview)
+        self.scrollbar_h.config(command=self.tree.xview)
+        self.tree.pack(fill="both", expand=True, padx=10, pady=10)
+
     def cargar(self):
         tipo = self.combo_tipo.get()
         periodo = PERIODO_KEY.get(self.combo_periodo.get(), "mes")
         dias = DIAS_KEY.get(self.combo_dias.get())
         self._headers, self._mostrar, self._exportar, self._crudas = self._obtener(tipo, periodo, dias)
-        self.tree.delete(*self.tree.get_children())
+        self._reconstruir_arbol()
         self.tree["columns"] = tuple(str(i) for i in range(len(self._headers)))
+        anchos = self._ancho_columnas()
         for i, head in enumerate(self._headers):
             self.tree.heading(str(i), text=head)
-            self.tree.column(str(i), width=150, anchor="w")
+            self.tree.column(str(i), width=anchos[i], minwidth=70, anchor="w", stretch=False)
         for fila in self._mostrar:
             self.tree.insert("", "end", values=fila)
         self._render_grafico(tipo)
@@ -164,7 +251,9 @@ class ReportesView:
             ctk.CTkLabel(self.chart_frame, text="Graficos no disponibles en este equipo.",
                          text_color="#AAAAAA", font=("Arial", 13)).pack(expand=True)
             return
-        fig = crear_grafico(tipo, self._crudas, self.combo_periodo.get())
+        ancho = max(self._chart_ancho, 300)
+        self._chart_render_ancho = ancho
+        fig = crear_grafico(tipo, self._crudas, self.combo_periodo.get(), ancho)
         if fig is None:
             ctk.CTkLabel(self.chart_frame, text="Sin grafico para este reporte.",
                          text_color="#AAAAAA", font=("Arial", 13)).pack(expand=True)

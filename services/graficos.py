@@ -18,8 +18,10 @@ ANCHO = 6.2
 ALTO = 2.2
 
 
-def _base(titulo):
-    fig = Figure(figsize=(ANCHO, ALTO), dpi=100, facecolor=BG, tight_layout=True)
+def _base(titulo, ancho_px=None):
+    ancho = (ancho_px or ANCHO * 100) / 100.0
+    alto = ancho * (ALTO / ANCHO)
+    fig = Figure(figsize=(ancho, alto), dpi=100, facecolor=BG, tight_layout=True)
     ax = fig.add_subplot(111)
     ax.set_facecolor(BG)
     ax.set_title(titulo, color=FG, fontsize=10, fontweight="bold")
@@ -42,8 +44,8 @@ def _etiqueta_dia(valor):
     return str(valor)
 
 
-def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, rotacion=0, alerta_dias=False):
-    fig, ax = _base(f"{titulo} - {periodo_label}".strip(" -") if periodo_label else titulo)
+def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, rotacion=0, alerta_dias=False, ancho_px=None):
+    fig, ax = _base(f"{titulo} - {periodo_label}".strip(" -") if periodo_label else titulo, ancho_px)
     ax.grid(axis="x", color="none")
     etiquetas = [_etiqueta_dia(f[key_x]) for f in filas]
     if rotacion:
@@ -63,11 +65,11 @@ def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, ro
     return fig
 
 
-def _descuentos(filas):
+def _descuentos(filas, ancho_px=None):
     f = filas[0]
     con = int(f["notas_con_descuento"])
     sin = int(f["notas"]) - con
-    fig, ax = _base("Notas con Descuento")
+    fig, ax = _base("Notas con Descuento", ancho_px)
     ax.grid(axis="x", color="none")
     ax.bar(["Con descuento", "Sin descuento"], [con, sin], color=[VERDE, GRIS], width=0.35)
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -75,7 +77,7 @@ def _descuentos(filas):
     return fig
 
 
-def _inactivos(filas):
+def _inactivos(filas, ancho_px=None):
     hoy = date.today()
     etiquetas = []
     valores = []
@@ -94,7 +96,7 @@ def _inactivos(filas):
     if not valores:
         return None
     etiquetas = [e[:24] for e in etiquetas]
-    fig, ax = _base("Dias Sin Comprar")
+    fig, ax = _base("Dias Sin Comprar", ancho_px)
     ax.grid(axis="x", color="none")
     ax.bar(etiquetas, valores, color=colores, width=0.35)
     if len(valores) == 1:
@@ -119,33 +121,33 @@ TIPOS_CON_GRAFICO = {
 }
 
 
-def crear_grafico(tipo, filas, periodo_label=""):
+def crear_grafico(tipo, filas, periodo_label="", ancho_px=None):
     if not GRAFICOS_OK or not filas or tipo not in TIPOS_CON_GRAFICO:
         return None
     if tipo == "Ventas por Periodo":
-        return _vertical(filas, "dia", "total", "Ventas por Dia", periodo_label, es_dinero=True)
+        return _vertical(filas, "dia", "total", "Ventas por Dia", periodo_label, es_dinero=True, ancho_px=ancho_px)
     if tipo == "Productos mas Vendidos":
-        return _vertical(filas, "nombre_producto", "unidades", "Unidades Vendidas por Producto", rotacion=30)
+        return _vertical(filas, "nombre_producto", "unidades", "Unidades Vendidas por Producto", rotacion=30, ancho_px=ancho_px)
     if tipo == "Productos menos Vendidos":
-        return _vertical(filas, "nombre_producto", "unidades", "Unidades por Producto", rotacion=30)
+        return _vertical(filas, "nombre_producto", "unidades", "Unidades por Producto", rotacion=30, ancho_px=ancho_px)
     if tipo == "Ventas por Cliente":
-        return _vertical(filas, "nombre", "total", "Ventas por Cliente", es_dinero=True, rotacion=30)
+        return _vertical(filas, "nombre", "total", "Ventas por Cliente", es_dinero=True, rotacion=30, ancho_px=ancho_px)
     if tipo == "Ventas por Vendedor":
-        return _vertical(filas, "usuario", "notas", "Cantidad de Ventas por Vendedor", rotacion=30)
+        return _vertical(filas, "usuario", "notas", "Cantidad de Ventas por Vendedor", rotacion=30, ancho_px=ancho_px)
     if tipo == "Ventas por Metodo de Pago":
-        return _vertical(filas, "metodo_pago", "total", "Ventas por Metodo de Pago", es_dinero=True, rotacion=30)
+        return _vertical(filas, "metodo_pago", "total", "Ventas por Metodo de Pago", es_dinero=True, rotacion=30, ancho_px=ancho_px)
     if tipo == "Descuentos Aplicados":
-        return _descuentos(filas)
+        return _descuentos(filas, ancho_px)
     if tipo == "Productos con Stock Bajo":
-        return _vertical(filas, "nombre_producto", "stock_total", "Stock Disponible", rotacion=30)
+        return _vertical(filas, "nombre_producto", "stock_total", "Stock Disponible", rotacion=30, ancho_px=ancho_px)
     if tipo == "Clientes Inactivos":
-        return _inactivos(filas)
+        return _inactivos(filas, ancho_px)
     if tipo == "Vencimientos de Lotes":
         filas_aux = [
             {**f, "etiqueta": f"{f['nombre_producto']} (L{f['lote']})"}
             for f in filas
         ]
-        return _vertical(filas_aux, "etiqueta", "dias", "Dias Restantes para Vencer", rotacion=30, alerta_dias=True)
+        return _vertical(filas_aux, "etiqueta", "dias", "Dias Restantes para Vencer", rotacion=30, alerta_dias=True, ancho_px=ancho_px)
     return None
 
 
