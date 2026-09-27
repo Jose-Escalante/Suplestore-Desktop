@@ -1,8 +1,10 @@
-import customtkinter as ctk
-from tkinter import filedialog, messagebox, ttk
 from datetime import datetime
+from tkinter import filedialog, messagebox, ttk
+
+import customtkinter as ctk
 
 from services.excel_export import exportar_ventas_xlsx
+from services.graficos import crear_grafico, crear_canvas, GRAFICOS_OK
 
 PERIODOS = ["Hoy", "Ultimos 7 dias", "Ultimos 30 dias"]
 OPCIONES_DIAS = ["30 dias", "60 dias", "90 dias", "Todos"]
@@ -32,11 +34,12 @@ class ReportesView:
         self._headers = []
         self._mostrar = []
         self._exportar = []
+        self._crudas = []
 
         top_bar = ctk.CTkFrame(self.root, fg_color="#5CB85C", height=30)
         top_bar.pack(fill="x", side="top")
         top_bar.pack_propagate(False)
-        ctk.CTkLabel(top_bar, text="Reportes Gerenciales", text_color="#111111", font=("Arial", 11, "bold")).pack(anchor="w", padx=12, pady=4)
+        ctk.CTkLabel(top_bar, text="Reportes Gerenciales", text_color="#111111", font=("Arial", 13, "bold")).pack(anchor="w", padx=12, pady=4)
 
         container = ctk.CTkFrame(self.root, fg_color="#3B3B3B")
         container.pack(fill="both", expand=True, padx=15, pady=15)
@@ -50,21 +53,35 @@ class ReportesView:
             ("Notas Registradas", str(kpis["notas"])),
             ("Producto Top", str(kpis["top_producto"])),
         ]:
-            tarjeta = ctk.CTkFrame(kpi_frame, fg_color="#5CB85C", corner_radius=8, height=54)
+            tarjeta = ctk.CTkFrame(kpi_frame, fg_color="#5CB85C", corner_radius=8, height=64)
             tarjeta.pack(side="left", padx=4, fill="x", expand=True)
             tarjeta.pack_propagate(False)
-            ctk.CTkLabel(tarjeta, text=titulo, text_color="#111111", font=("Arial", 9, "bold")).pack(anchor="w", padx=10, pady=(5, 0))
-            ctk.CTkLabel(tarjeta, text=valor, text_color="#111111", font=("Arial", 13, "bold")).pack(anchor="w", padx=10)
+            ctk.CTkLabel(tarjeta, text=titulo, text_color="#111111", font=("Arial", 10, "bold")).pack(anchor="w", padx=10, pady=(5, 0))
+            ctk.CTkLabel(tarjeta, text=valor, text_color="#111111", font=("Arial", 16, "bold")).pack(anchor="w", padx=10)
 
         body = ctk.CTkFrame(container, fg_color="#3B3B3B")
         body.pack(fill="both", expand=True)
 
-        table_frame = ctk.CTkFrame(body, fg_color="#777777", corner_radius=8)
-        table_frame.pack(side="left", fill="both", expand=True)
+        columna = ctk.CTkFrame(body, fg_color="#3B3B3B")
+        columna.pack(side="left", fill="both", expand=True)
+
+        self.chart_frame = ctk.CTkFrame(columna, fg_color="#3B3B3B", height=230)
+        self.chart_frame.pack(fill="x", pady=(0, 10))
+        self.chart_frame.pack_propagate(False)
+
+        table_frame = ctk.CTkFrame(columna, fg_color="#777777", corner_radius=8)
+        table_frame.pack(fill="both", expand=True)
 
         scrollbar = ttk.Scrollbar(table_frame, orient="vertical")
         scrollbar.pack(side="right", fill="y")
-        self.tree = ttk.Treeview(table_frame, show="headings", yscrollcommand=scrollbar.set)
+        try:
+            estilo = ttk.Style(controller.root)
+            estilo.configure("Reportes.Treeview", font=("Arial", 13), rowheight=30)
+            estilo.configure("Reportes.Treeview.Heading", font=("Arial", 13, "bold"))
+            estilo_tree = "Reportes.Treeview"
+        except Exception:
+            estilo_tree = "default"
+        self.tree = ttk.Treeview(table_frame, style=estilo_tree, show="headings", yscrollcommand=scrollbar.set)
         scrollbar.config(command=self.tree.yview)
         self.tree.pack(fill="both", expand=True, padx=10, pady=10)
 
@@ -72,25 +89,29 @@ class ReportesView:
         sidebar.pack(side="right", fill="y", padx=(12, 0))
         sidebar.pack_propagate(False)
 
-        ctk.CTkLabel(sidebar, text="Tipo de reporte:", text_color="#FFFFFF", font=("Arial", 10)).pack(anchor="w", pady=(4, 2))
-        self.combo_tipo = ctk.CTkComboBox(sidebar, values=self.tipos, state="readonly", command=self._cambiar_tipo)
+        ctk.CTkLabel(sidebar, text="Tipo de reporte:", text_color="#FFFFFF", font=("Arial", 12)).pack(anchor="w", pady=(4, 2))
+        self.combo_tipo = ctk.CTkComboBox(sidebar, values=self.tipos, state="readonly",
+                                          font=("Arial", 12), dropdown_font=("Arial", 12),
+                                          command=self._cambiar_tipo)
         self.combo_tipo.set(self.tipos[0])
         self.combo_tipo.pack(fill="x", pady=(0, 10))
 
-        self.lbl_periodo = ctk.CTkLabel(sidebar, text="Periodo:", text_color="#FFFFFF", font=("Arial", 10))
-        self.combo_periodo = ctk.CTkComboBox(sidebar, values=PERIODOS, state="readonly")
+        self.lbl_periodo = ctk.CTkLabel(sidebar, text="Periodo:", text_color="#FFFFFF", font=("Arial", 12))
+        self.combo_periodo = ctk.CTkComboBox(sidebar, values=PERIODOS, state="readonly",
+                                             font=("Arial", 12), dropdown_font=("Arial", 12))
         self.combo_periodo.set("Ultimos 30 dias")
 
-        self.lbl_dias = ctk.CTkLabel(sidebar, text="Filtro:", text_color="#FFFFFF", font=("Arial", 10))
-        self.combo_dias = ctk.CTkComboBox(sidebar, values=OPCIONES_DIAS, state="readonly")
+        self.lbl_dias = ctk.CTkLabel(sidebar, text="Filtro:", text_color="#FFFFFF", font=("Arial", 12))
+        self.combo_dias = ctk.CTkComboBox(sidebar, values=OPCIONES_DIAS, state="readonly",
+                                          font=("Arial", 12), dropdown_font=("Arial", 12))
         self.combo_dias.set("30 dias")
 
-        ctk.CTkButton(sidebar, text="Exportar Excel", fg_color="#5CB85C", text_color="#000000", font=("Arial", 11, "bold"),
-                      width=170, height=38, command=self.exportar_excel).pack(pady=(14, 6))
-        ctk.CTkButton(sidebar, text="Refrescar", fg_color="#E0A800", text_color="#000000", font=("Arial", 10, "bold"),
-                      width=170, height=30, command=self.cargar).pack(pady=6)
-        ctk.CTkButton(sidebar, text="Volver", fg_color="#E0E0E0", text_color="#000000", font=("Arial", 10, "bold"),
-                      width=170, height=30, command=controller.show_panel).pack(pady=(16, 0))
+        ctk.CTkButton(sidebar, text="Exportar Excel", fg_color="#5CB85C", text_color="#000000", font=("Arial", 12, "bold"),
+                      width=170, height=40, command=self.exportar_excel).pack(pady=(14, 6))
+        ctk.CTkButton(sidebar, text="Refrescar", fg_color="#E0A800", text_color="#000000", font=("Arial", 12, "bold"),
+                      width=170, height=34, command=self.cargar).pack(pady=6)
+        ctk.CTkButton(sidebar, text="Volver", fg_color="#E0E0E0", text_color="#000000", font=("Arial", 12, "bold"),
+                      width=170, height=34, command=controller.show_panel).pack(pady=(16, 0))
 
         self._actualizar_controles()
         self.cargar()
@@ -127,14 +148,31 @@ class ReportesView:
         tipo = self.combo_tipo.get()
         periodo = PERIODO_KEY.get(self.combo_periodo.get(), "mes")
         dias = DIAS_KEY.get(self.combo_dias.get())
-        self._headers, self._mostrar, self._exportar = self._obtener(tipo, periodo, dias)
+        self._headers, self._mostrar, self._exportar, self._crudas = self._obtener(tipo, periodo, dias)
         self.tree.delete(*self.tree.get_children())
         self.tree["columns"] = tuple(str(i) for i in range(len(self._headers)))
         for i, head in enumerate(self._headers):
             self.tree.heading(str(i), text=head)
-            self.tree.column(str(i), width=140, anchor="w")
+            self.tree.column(str(i), width=150, anchor="w")
         for fila in self._mostrar:
             self.tree.insert("", "end", values=fila)
+        self._render_grafico(tipo)
+
+    def _render_grafico(self, tipo):
+        for hijo in self.chart_frame.winfo_children():
+            hijo.destroy()
+        if not GRAFICOS_OK:
+            ctk.CTkLabel(self.chart_frame, text="Graficos no disponibles en este equipo.",
+                         text_color="#AAAAAA", font=("Arial", 13)).pack(expand=True)
+            return
+        fig = crear_grafico(tipo, self._crudas)
+        if fig is None:
+            ctk.CTkLabel(self.chart_frame, text="Sin grafico para este reporte.",
+                         text_color="#AAAAAA", font=("Arial", 13)).pack(expand=True)
+            return
+        canvas = crear_canvas(fig, self.chart_frame)
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+        canvas.draw()
 
     def _obtener(self, tipo, periodo, dias):
         model = self.controller.model
@@ -188,7 +226,7 @@ class ReportesView:
             headers = ["Producto", "Lote", "Stock", "Vencimiento", "Dias Restantes"]
             mostrar = [(f["nombre_producto"], f["lote"], f["stock"], self._fecha(f["vencimiento"]), f["dias"]) for f in filas]
             exportar = [(f["nombre_producto"], f["lote"], f["stock"], str(f["vencimiento"]), f["dias"]) for f in filas]
-        return headers, mostrar, exportar
+        return headers, mostrar, exportar, filas
 
     def exportar_excel(self):
         if not self._mostrar:

@@ -44,7 +44,7 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 **Reportes gerenciales**
 - Módulo independiente (permiso propio `modulo_reportes`) con resumen diario/semanal/mensual.
 - Reportes: ventas por período, productos más y menos vendidos, ventas por cliente/vendedor/método de pago, descuentos aplicados, stock bajo, clientes inactivos y vencimientos de lotes.
-- Tarjetas KPI (ventas de hoy, ventas del mes, notas registradas y producto top) y **exportación a Excel** de cada reporte.
+- Tarjetas KPI (ventas de hoy, ventas del mes, notas registradas y producto top), **gráficos de barras** (matplotlib, tema oscuro acorde a la app) y **exportación a Excel** de cada reporte.
 
 **Copias de seguridad**
 - Exportar la base de datos a un archivo `.sql` y restaurarla desde uno (con confirmación de reemplazo).
@@ -79,7 +79,8 @@ Suplestore Desktop/
 │   └── app_controller.py          # CAPA CONTROLADOR: estado, navegación, permisos
 ├── services/
 │   ├── nota_entrega.py            # Generación de notas de entrega en PDF
-│   └── excel_export.py            # Exportación de ventas a Excel
+│   ├── excel_export.py            # Exportación de ventas a Excel
+│   └── graficos.py                # Gráficos de barras para Reportes (matplotlib)
 └── views/                         # CAPA VISTA
     ├── login_view.py              # Inicio de sesión
     ├── cambio_password_view.py    # Cambio de contraseña obligatorio
@@ -90,7 +91,7 @@ Suplestore Desktop/
     ├── ventas_view.py             # Ventas, carrito, pago e historial de notas
     ├── inventario_view.py         # Inventario y lotes
     ├── historial_view.py          # Historial de eventos (bitácora)
-    └── reportes_view.py           # Reportes gerenciales (KPI + tablas + Excel)
+    └── reportes_view.py           # Reportes gerenciales (KPI + gráficos + tablas + Excel)
 ```
 
 ### Flujo de datos
