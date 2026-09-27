@@ -266,9 +266,14 @@ class ReportesView:
         model = self.controller.model
         if tipo == "Ventas por Periodo":
             filas = model.reporte_ventas_por_periodo(periodo)
-            headers = ["Dia", "Notas", "Total ($)"]
-            mostrar = [(self._fecha(f["dia"]), f["notas"], f"${float(f['total']):.2f}") for f in filas]
-            exportar = [(str(f["dia"]), f["notas"], float(f["total"])) for f in filas]
+            if periodo == "anio":
+                headers = ["Mes", "Notas", "Total ($)"]
+                mostrar = [(f["dia"].strftime("%m/%Y"), f["notas"], f"${float(f['total']):.2f}") for f in filas]
+                exportar = [(f["dia"].strftime("%Y-%m"), f["notas"], float(f["total"])) for f in filas]
+            else:
+                headers = ["Dia", "Notas", "Total ($)"]
+                mostrar = [(self._fecha(f["dia"]), f["notas"], f"${float(f['total']):.2f}") for f in filas]
+                exportar = [(str(f["dia"]), f["notas"], float(f["total"])) for f in filas]
         elif tipo == "Productos mas Vendidos":
             filas = model.reporte_productos_mas_vendidos(periodo)
             headers = ["Producto", "Unidades", "Ingresos ($)"]

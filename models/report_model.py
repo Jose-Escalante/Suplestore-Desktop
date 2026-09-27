@@ -31,6 +31,17 @@ class ReportModel:
         return {"ventas_hoy": ventas_hoy, "ventas_mes": ventas_mes, "notas": notas, "top_producto": top}
 
     def ventas_por_periodo(self, periodo):
+        if periodo == "anio":
+            self.db.cursor.execute(
+                "SELECT YEAR(n.fecha_hora) AS anio, MONTH(n.fecha_hora) AS mes, "
+                "COUNT(*) AS notas, SUM(n.monto_total) AS total "
+                "FROM notas_entrega n WHERE DATE(n.fecha_hora) BETWEEN %s AND %s "
+                "GROUP BY YEAR(n.fecha_hora), MONTH(n.fecha_hora) ORDER BY anio DESC, mes DESC",
+                self._rango(periodo))
+            filas = self.db.cursor.fetchall()
+            for f in filas:
+                f["dia"] = date(int(f.pop("anio")), int(f.pop("mes")), 1)
+            return filas
         self.db.cursor.execute(
             "SELECT DATE(n.fecha_hora) AS dia, COUNT(*) AS notas, SUM(n.monto_total) AS total "
             "FROM notas_entrega n WHERE DATE(n.fecha_hora) BETWEEN %s AND %s "

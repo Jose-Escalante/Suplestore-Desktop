@@ -44,10 +44,13 @@ def _etiqueta_dia(valor):
     return str(valor)
 
 
-def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, rotacion=0, alerta_dias=False, ancho_px=None):
+def _vertical(filas, key_x, key_y, titulo, periodo_label="", es_dinero=False, rotacion=0, alerta_dias=False, ancho_px=None, etiquetas_mes=False):
     fig, ax = _base(f"{titulo} - {periodo_label}".strip(" -") if periodo_label else titulo, ancho_px)
     ax.grid(axis="x", color="none")
-    etiquetas = [_etiqueta_dia(f[key_x]) for f in filas]
+    if etiquetas_mes:
+        etiquetas = [f[key_x].strftime("%m/%y") if hasattr(f[key_x], "strftime") else str(f[key_x]) for f in filas]
+    else:
+        etiquetas = [_etiqueta_dia(f[key_x]) for f in filas]
     if rotacion:
         etiquetas = [e[:24] for e in etiquetas]
     valores = [float(f[key_y]) for f in filas]
@@ -125,7 +128,10 @@ def crear_grafico(tipo, filas, periodo_label="", ancho_px=None):
     if not GRAFICOS_OK or not filas or tipo not in TIPOS_CON_GRAFICO:
         return None
     if tipo == "Ventas por Periodo":
-        return _vertical(filas, "dia", "total", "Ventas por Dia", periodo_label, es_dinero=True, ancho_px=ancho_px)
+        es_anio = periodo_label == "Ultimo anio"
+        titulo = "Ventas por Mes" if es_anio else "Ventas por Dia"
+        return _vertical(filas, "dia", "total", titulo, periodo_label, es_dinero=True,
+                         rotacion=25 if es_anio else 0, ancho_px=ancho_px, etiquetas_mes=es_anio)
     if tipo == "Productos mas Vendidos":
         return _vertical(filas, "nombre_producto", "unidades", "Unidades Vendidas por Producto", rotacion=30, ancho_px=ancho_px)
     if tipo == "Productos menos Vendidos":
