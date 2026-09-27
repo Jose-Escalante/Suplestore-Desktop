@@ -71,7 +71,7 @@ class ReportModel:
             "SELECT u.usuario, COUNT(*) AS notas, SUM(n.monto_total) AS total "
             "FROM notas_entrega n JOIN usuarios u ON n.id_usuario = u.id_usuario "
             "WHERE DATE(n.fecha_hora) BETWEEN %s AND %s "
-            "GROUP BY u.id_usuario, u.usuario ORDER BY total DESC",
+            "GROUP BY u.id_usuario, u.usuario ORDER BY notas DESC, total DESC",
             self._rango(periodo))
         return self.db.cursor.fetchall()
 

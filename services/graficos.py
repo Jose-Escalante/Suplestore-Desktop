@@ -127,7 +127,7 @@ def crear_grafico(tipo, filas, periodo_label=""):
     if tipo == "Ventas por Cliente":
         return _vertical(filas, "nombre", "total", "Ventas por Cliente", es_dinero=True, rotacion=30)
     if tipo == "Ventas por Vendedor":
-        return _vertical(filas, "usuario", "total", "Ventas por Vendedor", es_dinero=True, rotacion=30)
+        return _vertical(filas, "usuario", "notas", "Cantidad de Ventas por Vendedor", rotacion=30)
     if tipo == "Ventas por Metodo de Pago":
         return _vertical(filas, "metodo_pago", "total", "Ventas por Metodo de Pago", es_dinero=True, rotacion=30)
     if tipo == "Descuentos Aplicados":
