@@ -32,7 +32,7 @@ USE `suplestore_db`;
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
--- 2.1. roles: catalogo de roles del sistema (Administrador, Vendedor).
+-- 2.1. roles: catalogo de roles del sistema (Administrador, Vendedor y Gerente).
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `roles` (
   `id_rol`     INT          NOT NULL AUTO_INCREMENT,
@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS `permisos_usuario` (
   `modulo_ventas`     TINYINT(1) DEFAULT '0',
   `modulo_categorias` TINYINT(1) DEFAULT '0',
   `modulo_usuarios`   TINYINT(1) DEFAULT '0',
+  `modulo_respaldos`  TINYINT(1) NOT NULL DEFAULT '0',
   `modulo_historial`  TINYINT(1) NOT NULL DEFAULT '0',
   `modulo_reportes`   TINYINT(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_permiso`),
@@ -209,19 +210,30 @@ CREATE TABLE IF NOT EXISTS `eventos` (
 -- 3. DATOS INICIALES
 -- ============================================================================
 
--- 3.1. Roles del sistema (Administrador y Vendedor)
+-- 3.1. Roles del sistema (Administrador, Vendedor y Gerente)
 INSERT INTO `roles` (`id_rol`, `nombre_rol`) VALUES
 (1, 'Administrador'),
-(2, 'Vendedor');
+(2, 'Vendedor'),
+(3, 'Gerente');
 
 -- 3.2. Usuario administrador por defecto.
 --      Usuario: admin | Contrasena: admin123 (encriptada con bcrypt)
 INSERT INTO `usuarios` (`id_usuario`, `usuario`, `contrasena`, `cambio_obligatorio`, `id_rol`) VALUES
 (1, 'admin', '$2b$12$cN.BRaTRqS0xc6gFyV7squ880B5vmTT3RYSOUQuD/Kq.3.raO5LfS', 0, 1);
 
+-- 3.2b. Usuario gerente de demostracion.
+--       Usuario: gerente | Contrasena temporal: Gerente2026! (cambio obligatorio)
+INSERT INTO `usuarios` (`id_usuario`, `usuario`, `contrasena`, `cambio_obligatorio`, `id_rol`) VALUES
+(2, 'gerente', '$2b$12$paEY4tYI4YcqdMEBsP6fV.rEvcr4BETlIyP3TQvQmRCtC55p.D/ue', 1, 3);
+
 -- 3.3. Permisos totales para el administrador
-INSERT INTO `permisos_usuario` (`id_usuario`, `modulo_inventario`, `modulo_clientes`, `modulo_ventas`, `modulo_categorias`, `modulo_usuarios`, `modulo_historial`, `modulo_reportes`) VALUES
-(1, 1, 1, 1, 1, 1, 1, 1);
+INSERT INTO `permisos_usuario` (`id_usuario`, `modulo_inventario`, `modulo_clientes`, `modulo_ventas`, `modulo_categorias`, `modulo_usuarios`, `modulo_respaldos`, `modulo_historial`, `modulo_reportes`) VALUES
+(1, 1, 1, 1, 1, 1, 1, 1, 1);
+
+-- 3.3b. Permisos del gerente: inventario, clientes, ventas, categorias, historial
+--       y reportes. Sin usuarios ni respaldos (solo el administrador los tiene).
+INSERT INTO `permisos_usuario` (`id_usuario`, `modulo_inventario`, `modulo_clientes`, `modulo_ventas`, `modulo_categorias`, `modulo_usuarios`, `modulo_respaldos`, `modulo_historial`, `modulo_reportes`) VALUES
+(2, 1, 1, 1, 1, 0, 0, 1, 1);
 
 -- 3.4. Cliente generico para ventas sin cliente definido
 INSERT INTO `clientes` (`id_cliente`, `nombre`, `apellido`, `cedula`, `telefono`) VALUES

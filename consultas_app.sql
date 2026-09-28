@@ -35,12 +35,12 @@
 -- 1.1. Obtener el id de un rol a partir de su nombre.
 --      (Se usa al crear/editar usuarios: el nombre del rol seleccionado
 --      en pantalla se convierte en el id_rol que guarda la tabla usuarios.)
-SELECT `id_rol` FROM `roles` WHERE `nombre_rol` = %s;          -- %s = 'Administrador' | 'Vendedor'
+SELECT `id_rol` FROM `roles` WHERE `nombre_rol` = %s;          -- %s = 'Administrador' | 'Vendedor' | 'Gerente'
 
 -- 1.2. LOGIN: valida credenciales y trae el usuario con su rol.
 --      Este JOIN es la razon por la que la tabla `roles` esta normalizada:
---      el rol llega como texto legible (Administrador/Vendedor) sin duplicar
---      el nombre en cada fila de usuarios.
+--      el rol llega como texto legible (Administrador/Vendedor/Gerente) sin
+--      duplicar el nombre en cada fila de usuarios.
 SELECT u.*, r.nombre_rol AS `rol`
 FROM `usuarios` u
 JOIN `roles` r ON u.id_rol = r.id_rol
@@ -88,6 +88,18 @@ WHERE `id_usuario` = %s;
 -- 1.10. Permisos por modulo de un usuario (un registro por usuario).
 SELECT * FROM `permisos_usuario` WHERE `id_usuario` = %s;
 
+-- 1.11. NIVELES DE ACCESO: matriz de permisos por usuario (3 roles).
+--       Gerente: inventario, clientes, ventas, categorias, historial y reportes.
+--       Sin usuarios ni respaldos (solo el Administrador los tiene).
+SELECT u.id_usuario, u.usuario, r.nombre_rol AS `rol`,
+       p.`modulo_inventario`, p.`modulo_clientes`, p.`modulo_ventas`,
+       p.`modulo_categorias`, p.`modulo_usuarios`, p.`modulo_respaldos`,
+       p.`modulo_historial`, p.`modulo_reportes`
+FROM `usuarios` u
+JOIN `roles` r ON u.id_rol = r.id_rol
+JOIN `permisos_usuario` p ON p.id_usuario = u.id_usuario
+ORDER BY u.id_usuario;
+
 
 -- ============================================================================
 -- 2. USUARIOS (CRUD)
@@ -106,8 +118,9 @@ VALUES (%s, %s, 1, %s);
 
 INSERT INTO `permisos_usuario`
   (`id_usuario`, `modulo_inventario`, `modulo_clientes`, `modulo_ventas`,
-   `modulo_categorias`, `modulo_usuarios`, `modulo_historial`, `modulo_reportes`)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
+   `modulo_categorias`, `modulo_usuarios`, `modulo_respaldos`,
+   `modulo_historial`, `modulo_reportes`)
+VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
 
 -- 2.3. Actualizar usuario (con nueva contrasena y rol).
 UPDATE `usuarios`
@@ -120,8 +133,8 @@ UPDATE `usuarios` SET `usuario` = %s, `id_rol` = %s WHERE `id_usuario` = %s;
 -- 2.3c. Actualizar los permisos del usuario.
 UPDATE `permisos_usuario`
 SET `modulo_inventario` = %s, `modulo_clientes` = %s, `modulo_ventas` = %s,
-    `modulo_categorias` = %s, `modulo_usuarios` = %s, `modulo_historial` = %s,
-    `modulo_reportes` = %s
+    `modulo_categorias` = %s, `modulo_usuarios` = %s, `modulo_respaldos` = %s,
+    `modulo_historial` = %s, `modulo_reportes` = %s
 WHERE `id_usuario` = %s;
 
 -- 2.4. Eliminar usuario: primero los permisos (FK), luego el usuario.

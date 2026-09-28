@@ -7,8 +7,9 @@ from models.user_model import validar_complejidad
 from services.ui_utils import traer_al_frente
 
 PRESETS_ROLES = {
-    "Administrador": [True, True, True, True, True, True, True],
-    "Vendedor": [False, False, False, False, False, False, False],
+    "Administrador": [True, True, True, True, True, True, True, True],
+    "Vendedor": [False, False, False, False, False, False, False, False],
+    "Gerente": [True, True, True, True, False, False, True, True],
 }
 
 
@@ -123,10 +124,11 @@ class UsuariosView:
         var_ven = ctk.BooleanVar(value=True)
         var_cat = ctk.BooleanVar(value=True)
         var_usu = ctk.BooleanVar(value=True)
+        var_res = ctk.BooleanVar(value=True)
         var_his = ctk.BooleanVar(value=True)
         var_rep = ctk.BooleanVar(value=True)
 
-        self._vars_agregar = (var_inv, var_cli, var_ven, var_cat, var_usu, var_his, var_rep)
+        self._vars_agregar = (var_inv, var_cli, var_ven, var_cat, var_usu, var_res, var_his, var_rep)
         self._combo_rol_agregar = combo_rol
 
         ctk.CTkCheckBox(chk_frame, text="Modulo Inventario", variable=var_inv, onvalue=True, offvalue=False).pack(anchor="w")
@@ -134,6 +136,7 @@ class UsuariosView:
         ctk.CTkCheckBox(chk_frame, text="Modulo Ventas", variable=var_ven, onvalue=True, offvalue=False).pack(anchor="w")
         ctk.CTkCheckBox(chk_frame, text="Modulo Categorias", variable=var_cat, onvalue=True, offvalue=False).pack(anchor="w")
         ctk.CTkCheckBox(chk_frame, text="Modulo Usuarios", variable=var_usu, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Modulo Respaldos", variable=var_res, onvalue=True, offvalue=False).pack(anchor="w")
         ctk.CTkCheckBox(chk_frame, text="Modulo Historial", variable=var_his, onvalue=True, offvalue=False).pack(anchor="w")
         ctk.CTkCheckBox(chk_frame, text="Modulo Reportes", variable=var_rep, onvalue=True, offvalue=False).pack(anchor="w")
 
@@ -154,6 +157,7 @@ class UsuariosView:
                 "ventas": var_ven.get(),
                 "categorias": var_cat.get(),
                 "usuarios": var_usu.get(),
+                "respaldos": var_res.get(),
                 "historial": var_his.get(),
                 "reportes": var_rep.get()
             }
@@ -168,7 +172,7 @@ class UsuariosView:
     def _cambiar_rol_evento_agregar(self, valor):
         if not hasattr(self, '_vars_agregar'):
             return
-        preset = PRESETS_ROLES.get(valor, [False] * 7)
+        preset = PRESETS_ROLES.get(valor, [False] * 8)
         for var, on in zip(self._vars_agregar, preset):
             var.set(on)
 
@@ -214,10 +218,11 @@ class UsuariosView:
         var_ven = ctk.BooleanVar(value=bool(permisos_actuales["modulo_ventas"]) if permisos_actuales else True)
         var_cat = ctk.BooleanVar(value=bool(permisos_actuales["modulo_categorias"]) if permisos_actuales else True)
         var_usu = ctk.BooleanVar(value=bool(permisos_actuales["modulo_usuarios"]) if permisos_actuales else True)
+        var_res = ctk.BooleanVar(value=bool(permisos_actuales["modulo_respaldos"]) if permisos_actuales else True)
         var_his = ctk.BooleanVar(value=bool(permisos_actuales["modulo_historial"]) if permisos_actuales else True)
         var_rep = ctk.BooleanVar(value=bool(permisos_actuales["modulo_reportes"]) if permisos_actuales else True)
 
-        self._vars_actualizar = (var_inv, var_cli, var_ven, var_cat, var_usu, var_his, var_rep)
+        self._vars_actualizar = (var_inv, var_cli, var_ven, var_cat, var_usu, var_res, var_his, var_rep)
         self._combo_rol_actualizar = combo_rol
 
         ctk.CTkLabel(modal, text="Permisos del Usuario:", text_color="#FFFFFF", font=("Arial", 10, "bold")).pack(anchor="w", padx=30, pady=(15, 5))
@@ -230,6 +235,7 @@ class UsuariosView:
         ctk.CTkCheckBox(chk_frame, text="Modulo Ventas", variable=var_ven, onvalue=True, offvalue=False).pack(anchor="w")
         ctk.CTkCheckBox(chk_frame, text="Modulo Categorias", variable=var_cat, onvalue=True, offvalue=False).pack(anchor="w")
         ctk.CTkCheckBox(chk_frame, text="Modulo Usuarios", variable=var_usu, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Modulo Respaldos", variable=var_res, onvalue=True, offvalue=False).pack(anchor="w")
         ctk.CTkCheckBox(chk_frame, text="Modulo Historial", variable=var_his, onvalue=True, offvalue=False).pack(anchor="w")
         ctk.CTkCheckBox(chk_frame, text="Modulo Reportes", variable=var_rep, onvalue=True, offvalue=False).pack(anchor="w")
 
@@ -255,6 +261,7 @@ class UsuariosView:
                 "ventas": var_ven.get(),
                 "categorias": var_cat.get(),
                 "usuarios": var_usu.get(),
+                "respaldos": var_res.get(),
                 "historial": var_his.get(),
                 "reportes": var_rep.get()
             }
@@ -271,7 +278,7 @@ class UsuariosView:
     def _cambiar_rol_evento_actualizar(self, valor):
         if not hasattr(self, '_vars_actualizar'):
             return
-        preset = PRESETS_ROLES.get(valor, [False] * 7)
+        preset = PRESETS_ROLES.get(valor, [False] * 8)
         for var, on in zip(self._vars_actualizar, preset):
             var.set(on)
 

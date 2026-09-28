@@ -68,10 +68,11 @@ class PanelView:
                       width=btn_width, height=btn_height, corner_radius=8,
                       command=controller.show_categorias).grid(row=1, column=2, padx=5, pady=8)
 
-        ctk.CTkButton(grid_frame, text="Respaldo BD", image=icon("inventario_registrar"), compound="left",
-                      fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),
-                      width=btn_width, height=btn_height, corner_radius=8,
-                      command=self.abrir_modal_respaldo).grid(row=2, column=1, padx=5, pady=8)
+        if controller.verificar_permiso("respaldos"):
+            ctk.CTkButton(grid_frame, text="Respaldo BD", image=icon("inventario_registrar"), compound="left",
+                          fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),
+                          width=btn_width, height=btn_height, corner_radius=8,
+                          command=self.abrir_modal_respaldo).grid(row=2, column=1, padx=5, pady=8)
 
         ctk.CTkButton(grid_frame, text="Reportes", image=icon("ventas_ver_ventas"), compound="left",
                       fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),

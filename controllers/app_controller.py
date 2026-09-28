@@ -56,6 +56,7 @@ class AppController:
             "ventas": permisos["modulo_ventas"],
             "categorias": permisos["modulo_categorias"],
             "usuarios": permisos["modulo_usuarios"],
+            "respaldos": permisos["modulo_respaldos"],
             "historial": permisos["modulo_historial"],
             "reportes": permisos["modulo_reportes"]
         }

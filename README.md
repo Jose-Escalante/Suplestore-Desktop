@@ -6,7 +6,7 @@ Aplicación de escritorio construida con Python + Tkinter (CustomTkinter) y MySQ
 
 ## Alcance del sistema
 
-El sistema consta de **ocho módulos de trabajo** interconectados y gobernados por un esquema de permisos por rol (Administrador o Vendedor):
+El sistema consta de **ocho módulos de trabajo** interconectados y gobernados por un esquema de permisos por módulo con **tres niveles de acceso**: Administrador, Gerente y Vendedor.
 
 1. **Inicio de sesión y seguridad**: acceso con contraseñas cifradas (bcrypt), bloqueo temporal de 5 minutos tras 5 intentos fallidos, cambio obligatorio de contraseña en el primer ingreso y aviso de lotes próximos a vencer (< 90 días).
 2. **Inventario y categorías**: catálogo de productos por lotes con **un solo lote activo por producto** y CRUD de categorías.
@@ -27,7 +27,7 @@ El sistema consta de **ocho módulos de trabajo** interconectados y gobernados p
 - **Contraseñas seguras**: mínimo 8 caracteres con mayúscula, minúscula, número y símbolo.
 - **Cambio de contraseña obligatorio** en el primer ingreso o tras un reseteo (`cambio_obligatorio`).
 - **Reseteo de contraseña** por el administrador (exige su clave actual y deja una clave temporal).
-- Permisos por módulo para cada usuario (Administrador / Vendedor).
+- Permisos por módulo para cada usuario (Administrador / Gerente / Vendedor). El rol **Gerente** gestiona inventario, clientes, ventas, categorías, historial y reportes; **sin** acceso a usuarios ni respaldos de BD (solo Administrador).
 
 **Panel de control**
 - Acceso por módulos según permisos: Inventario, Clientes, Ventas, Usuarios, Categorías, Historial, Reportes y Respaldo BD.
@@ -145,6 +145,7 @@ Las credenciales de conexión se configuran únicamente en un archivo `.env` en 
 | Usuario | Contraseña | Rol |
 |---------|-----------|-----|
 | admin   | admin123   | Administrador |
+| gerente | Gerente2026! (temporal, cambio obligatorio) | Gerente |
 
 ## Ejecución
 
