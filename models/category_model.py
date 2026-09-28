@@ -19,7 +19,7 @@ class CategoryModel:
             return True
         except mysql.connector.Error as err:
             self.db.rollback()
-            messagebox.showerror("Error de Base de Datos", f"No se pudo agregar la categoria:\n{err}")
+            messagebox.showerror("Error de Base de Datos", f"No se pudo agregar la categoría:\n{err}")
             return False
 
     def eliminar_categoria(self, id_categoria):
@@ -30,5 +30,5 @@ class CategoryModel:
             return True
         except mysql.connector.Error as err:
             self.db.rollback()
-            messagebox.showerror("Error de Base de Datos", f"No se pudo eliminar la categoria (Puede estar asociada a productos):\n{err}")
+            messagebox.showerror("Error de Base de Datos", f"No se pudo eliminar la categoría (Puede estar asociada a productos):\n{err}")
             return False

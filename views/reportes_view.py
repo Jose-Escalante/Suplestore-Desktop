@@ -6,11 +6,11 @@ import customtkinter as ctk
 from services.excel_export import exportar_ventas_xlsx
 from services.graficos import crear_grafico, crear_canvas, GRAFICOS_OK
 
-PERIODOS = ["Ultima semana", "Ultimo mes", "Ultimo anio"]
-OPCIONES_DIAS = ["30 dias", "60 dias", "90 dias", "Todos"]
+PERIODOS = ["Última semana", "Último mes", "Último año"]
+OPCIONES_DIAS = ["30 días", "60 días", "90 días", "Todos"]
 
-PERIODO_KEY = {"Ultima semana": "semana", "Ultimo mes": "mes", "Ultimo anio": "anio"}
-DIAS_KEY = {"30 dias": 30, "60 dias": 60, "90 dias": 90, "Todos": None}
+PERIODO_KEY = {"Última semana": "semana", "Último mes": "mes", "Último año": "anio"}
+DIAS_KEY = {"30 días": 30, "60 días": 60, "90 días": 90, "Todos": None}
 
 
 class ReportesView:
@@ -18,12 +18,12 @@ class ReportesView:
         self.controller = controller
         self.root = controller.root
         self.tipos = [
-            "Ventas por Periodo",
-            "Productos mas Vendidos",
+            "Ventas por Período",
+            "Productos más Vendidos",
             "Productos menos Vendidos",
             "Ventas por Cliente",
             "Ventas por Vendedor",
-            "Ventas por Metodo de Pago",
+            "Ventas por Método de Pago",
             "Descuentos Aplicados",
             "Productos con Stock Bajo",
             "Clientes Inactivos",
@@ -100,15 +100,15 @@ class ReportesView:
         self.combo_tipo.set(self.tipos[0])
         self.combo_tipo.pack(fill="x", pady=(0, 10))
 
-        self.lbl_periodo = ctk.CTkLabel(sidebar, text="Periodo:", text_color="#FFFFFF", font=("Arial", 12))
+        self.lbl_periodo = ctk.CTkLabel(sidebar, text="Período:", text_color="#FFFFFF", font=("Arial", 12))
         self.combo_periodo = ctk.CTkComboBox(sidebar, values=PERIODOS, state="readonly",
                                              font=("Arial", 12), dropdown_font=("Arial", 12))
-        self.combo_periodo.set("Ultimo mes")
+        self.combo_periodo.set("Último mes")
 
         self.lbl_dias = ctk.CTkLabel(sidebar, text="Filtro:", text_color="#FFFFFF", font=("Arial", 12))
         self.combo_dias = ctk.CTkComboBox(sidebar, values=OPCIONES_DIAS, state="readonly",
                                           font=("Arial", 12), dropdown_font=("Arial", 12))
-        self.combo_dias.set("30 dias")
+        self.combo_dias.set("30 días")
 
         ctk.CTkButton(sidebar, text="Exportar Excel", fg_color="#5CB85C", text_color="#000000", font=("Arial", 12, "bold"),
                       width=170, height=40, command=self.exportar_excel).pack(pady=(14, 6))
@@ -123,7 +123,7 @@ class ReportesView:
         self.cargar()
 
     def _cambiar_tipo(self, _valor):
-        self.combo_dias.set("30 dias")
+        self.combo_dias.set("30 días")
         self._actualizar_controles()
         self.cargar()
 
@@ -142,7 +142,7 @@ class ReportesView:
             else:
                 self.combo_dias.configure(values=OPCIONES_DIAS[:-1])
                 if self.combo_dias.get() == "Todos":
-                    self.combo_dias.set("90 dias")
+                    self.combo_dias.set("90 días")
             self.lbl_dias.pack(anchor="w", pady=(0, 2))
             self.combo_dias.pack(fill="x", pady=(0, 10))
         else:
@@ -248,14 +248,14 @@ class ReportesView:
         for hijo in self.chart_frame.winfo_children():
             hijo.destroy()
         if not GRAFICOS_OK:
-            ctk.CTkLabel(self.chart_frame, text="Graficos no disponibles en este equipo.",
+            ctk.CTkLabel(self.chart_frame, text="Gráficos no disponibles en este equipo.",
                          text_color="#AAAAAA", font=("Arial", 13)).pack(expand=True)
             return
         ancho = max(self._chart_ancho, 300)
         self._chart_render_ancho = ancho
         fig = crear_grafico(tipo, self._crudas, self.combo_periodo.get(), ancho)
         if fig is None:
-            ctk.CTkLabel(self.chart_frame, text="Sin grafico para este reporte.",
+            ctk.CTkLabel(self.chart_frame, text="Sin gráfico para este reporte.",
                          text_color="#AAAAAA", font=("Arial", 13)).pack(expand=True)
             return
         canvas = crear_canvas(fig, self.chart_frame)
@@ -264,17 +264,17 @@ class ReportesView:
 
     def _obtener(self, tipo, periodo, dias):
         model = self.controller.model
-        if tipo == "Ventas por Periodo":
+        if tipo == "Ventas por Período":
             filas = model.reporte_ventas_por_periodo(periodo)
             if periodo == "anio":
                 headers = ["Mes", "Notas", "Total ($)"]
                 mostrar = [(f["dia"].strftime("%m/%Y"), f["notas"], f"${float(f['total']):.2f}") for f in filas]
                 exportar = [(f["dia"].strftime("%Y-%m"), f["notas"], float(f["total"])) for f in filas]
             else:
-                headers = ["Dia", "Notas", "Total ($)"]
+                headers = ["Día", "Notas", "Total ($)"]
                 mostrar = [(self._fecha(f["dia"]), f["notas"], f"${float(f['total']):.2f}") for f in filas]
                 exportar = [(str(f["dia"]), f["notas"], float(f["total"])) for f in filas]
-        elif tipo == "Productos mas Vendidos":
+        elif tipo == "Productos más Vendidos":
             filas = model.reporte_productos_mas_vendidos(periodo)
             headers = ["Producto", "Unidades", "Ingresos ($)"]
             mostrar = [(f["nombre_producto"], f["unidades"], f"${float(f['ingresos']):.2f}") for f in filas]
@@ -294,9 +294,9 @@ class ReportesView:
             headers = ["Vendedor", "Notas", "Total ($)"]
             mostrar = [(f["usuario"], f["notas"], f"${float(f['total']):.2f}") for f in filas]
             exportar = [(f["usuario"], f["notas"], float(f["total"])) for f in filas]
-        elif tipo == "Ventas por Metodo de Pago":
+        elif tipo == "Ventas por Método de Pago":
             filas = model.reporte_ventas_por_metodo_pago(periodo)
-            headers = ["Metodo de Pago", "Notas", "Total ($)"]
+            headers = ["Método de Pago", "Notas", "Total ($)"]
             mostrar = [(f["metodo_pago"], f["notas"], f"${float(f['total']):.2f}") for f in filas]
             exportar = [(f["metodo_pago"], f["notas"], float(f["total"])) for f in filas]
         elif tipo == "Descuentos Aplicados":
@@ -313,12 +313,12 @@ class ReportesView:
             filas = model.reporte_clientes_inactivos(dias or 90)
             for f in filas:
                 f["dias_filtro"] = dias or 90
-            headers = ["Cliente", "Cedula", "Telefono", "Ultima Venta"]
+            headers = ["Cliente", "Cédula", "Teléfono", "Última Venta"]
             mostrar = [(f["nombre"], f["cedula"], f["telefono"], self._fecha(f["ultima_venta"])) for f in filas]
             exportar = [(f["nombre"], f["cedula"], f["telefono"], str(f["ultima_venta"])) for f in filas]
         else:
             filas = model.reporte_vencimientos_lotes(dias)
-            headers = ["Producto", "Lote", "Stock", "Vencimiento", "Dias Restantes"]
+            headers = ["Producto", "Lote", "Stock", "Vencimiento", "Días Restantes"]
             mostrar = [(f["nombre_producto"], f["lote"], f["stock"], self._fecha(f["vencimiento"]), f["dias"]) for f in filas]
             exportar = [(f["nombre_producto"], f["lote"], f["stock"], str(f["vencimiento"]), f["dias"]) for f in filas]
         return headers, mostrar, exportar, filas
@@ -334,7 +334,7 @@ class ReportesView:
         if not ruta:
             return
         exportar_ventas_xlsx(ruta, self._headers, self._exportar, titulo=self.combo_tipo.get())
-        messagebox.showinfo("Exito", f"Reporte exportado en:\n{ruta}")
+        messagebox.showinfo("Éxito", f"Reporte exportado en:\n{ruta}")
 
     @staticmethod
     def _fecha(valor):

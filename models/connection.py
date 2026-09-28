@@ -30,7 +30,7 @@ class DatabaseConnection:
         password = os.getenv("DB_PASSWORD", "")
         database = os.getenv("DB_NAME")
         if not host or not user or not database:
-            messagebox.showerror("Error de Conexion", "Faltan datos de conexion en el archivo .env (DB_HOST, DB_USER, DB_NAME).")
+            messagebox.showerror("Error de Conexión", "Faltan datos de conexión en el archivo .env (DB_HOST, DB_USER, DB_NAME).")
             exit()
         try:
             self.conexion = mysql.connector.connect(
@@ -41,7 +41,7 @@ class DatabaseConnection:
             )
             self.cursor = self.conexion.cursor(dictionary=True)
         except mysql.connector.Error as err:
-            messagebox.showerror("Error de Conexion", f"No se pudo conectar a la BD:\n{err}")
+            messagebox.showerror("Error de Conexión", f"No se pudo conectar a la BD:\n{err}")
             exit()
 
     def commit(self):

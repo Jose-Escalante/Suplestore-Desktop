@@ -30,7 +30,7 @@ El sistema consta de **ocho módulos de trabajo** interconectados y gobernados p
 - Permisos por módulo para cada usuario (Administrador / Gerente / Vendedor). El rol **Gerente** gestiona inventario, clientes, ventas, categorías, historial y reportes; **sin** acceso a usuarios ni respaldos de BD (solo Administrador).
 
 **Panel de control**
-- Acceso por módulos según permisos: Inventario, Clientes, Ventas, Usuarios, Categorías, Historial, Reportes y Respaldo BD.
+- Acceso por módulos según los permisos de cada usuario: el panel **solo muestra los botones de los módulos permitidos** (p. ej. el Gerente no ve Usuarios ni Respaldo BD).
 
 **Inventario**
 - Gestión de productos y lotes: stock, costos, precios y fechas de vencimiento.
@@ -55,7 +55,7 @@ El sistema consta de **ocho módulos de trabajo** interconectados y gobernados p
 
 **Historial (bitácora)**
 - Registro automático de eventos: inicios/cierre de sesión, ventas, cambios y reseteos de contraseña y respaldos.
-- Filtros por usuario, detalle y tipo de evento. Visible solo para administradores. Útil como evidencia ante sabotajes.
+- Filtros por usuario, detalle y tipo de evento. Con permiso de historial (Administrador y Gerente). Útil como evidencia ante sabotajes.
 
 **Reportes gerenciales**
 - Módulo independiente (permiso propio `modulo_reportes`) con filtro de periodo semanal, mensual y anual (ventanas móviles de 7, 30 y 365 días); el período **Último Año agrupa por mes** para que el gráfico no se empalme.
@@ -140,12 +140,13 @@ Ejecutar el script de inicialización `suplestore_db_full.sql` para crear la bas
 
 Las credenciales de conexión se configuran únicamente en un archivo `.env` en la raíz del proyecto (no se sube a git); la app no se conecta sin él.
 
-## Usuario inicial
+## Roles
 
-| Usuario | Contraseña | Rol |
-|---------|-----------|-----|
-| admin   | admin123   | Administrador |
-| gerente | Gerente2026! (temporal, cambio obligatorio) | Gerente |
+El sistema cuenta con tres niveles de acceso:
+
+- Administrador
+- Gerente
+- Vendedor
 
 ## Ejecución
 

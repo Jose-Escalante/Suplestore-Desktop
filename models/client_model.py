@@ -26,7 +26,7 @@ class ClientModel:
             self.db.commit()
             return True
         except mysql.connector.Error as err:
-            messagebox.showerror("Error de Base de Datos", f"No se pudo registrar el cliente (Verifique si la cedula ya existe):\n{err}")
+            messagebox.showerror("Error de Base de Datos", f"No se pudo registrar el cliente (Verifique si la cédula ya existe):\n{err}")
             return False
 
     def actualizar_cliente(self, id_cliente, nombre, apellido, cedula, telefono):

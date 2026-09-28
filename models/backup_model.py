@@ -67,8 +67,8 @@ class BackupModel:
             vistas = self._obtener_vistas()
             fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             with open(ruta, "w", encoding="utf-8") as f:
-                f.write(f"-- Respaldo Suplestore Tachira - {fecha}\n")
-                f.write(f"-- Generado automaticamente por la aplicacion\n")
+                f.write(f"-- Respaldo Suplestore Táchira - {fecha}\n")
+                f.write(f"-- Generado automáticamente por la aplicación\n")
                 f.write("SET FOREIGN_KEY_CHECKS=0;\n\n")
                 for t in tablas:
                     self.db.cursor.execute(f"SHOW CREATE TABLE `{t}`")
@@ -100,7 +100,7 @@ class BackupModel:
             with open(ruta, "r", encoding="utf-8") as f:
                 contenido = f.read()
             if "SET FOREIGN_KEY_CHECKS=0" not in contenido:
-                messagebox.showerror("Respaldos invalido", "El archivo no parece un respaldo de Suplestore valido.")
+                messagebox.showerror("Respaldo inválido", "El archivo no parece un respaldo de Suplestore válido.")
                 return False
 
             self.db.cursor.execute("SET FOREIGN_KEY_CHECKS=0")

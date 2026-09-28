@@ -10,15 +10,15 @@ MINUTOS_BLOQUEO = 5
 
 def validar_complejidad(contrasena):
     if len(contrasena) < 8:
-        return False, "La contrasena debe tener minimo 8 caracteres."
+        return False, "La contraseña debe tener mínimo 8 caracteres."
     if not re.search(r"[A-Z]", contrasena):
-        return False, "La contrasena debe incluir al menos una mayuscula."
+        return False, "La contraseña debe incluir al menos una mayúscula."
     if not re.search(r"[a-z]", contrasena):
-        return False, "La contrasena debe incluir al menos una minuscula."
+        return False, "La contraseña debe incluir al menos una minúscula."
     if not re.search(r"[0-9]", contrasena):
-        return False, "La contrasena debe incluir al menos un numero."
+        return False, "La contraseña debe incluir al menos un número."
     if not re.search(r"[^A-Za-z0-9]", contrasena):
-        return False, "La contrasena debe incluir al menos un simbolo."
+        return False, "La contraseña debe incluir al menos un símbolo."
     return True, ""
 
 
@@ -163,7 +163,7 @@ class UserModel:
             self.db.commit()
             return True
         except mysql.connector.Error as err:
-            messagebox.showerror("Error de Base de Datos", f"No se pudo resetear la contrasena:\n{err}")
+            messagebox.showerror("Error de Base de Datos", f"No se pudo resetear la contraseña:\n{err}")
             return False
 
     def verificar_contrasena(self, id_usuario, contrasena):
@@ -188,7 +188,7 @@ class UserModel:
             self.db.commit()
             return True
         except mysql.connector.Error as err:
-            messagebox.showerror("Error de Base de Datos", f"No se pudo cambiar la contrasena:\n{err}")
+            messagebox.showerror("Error de Base de Datos", f"No se pudo cambiar la contraseña:\n{err}")
             return False
 
     def obtener_permisos_usuario(self, id_usuario):

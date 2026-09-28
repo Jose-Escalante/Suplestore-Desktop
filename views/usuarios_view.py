@@ -77,7 +77,7 @@ class UsuariosView:
                       width=btn_size, height=btn_size, corner_radius=10,
                       command=self.eliminar_seleccionado).grid(row=1, column=0, columnspan=2, padx=6, pady=6)
 
-        ctk.CTkButton(btn_frame, text="Resetear Contrasena", image=ico("boton_reset.png", 30), compound="top",
+        ctk.CTkButton(btn_frame, text="Resetear Contraseña", image=ico("boton_reset.png", 30), compound="top",
                       fg_color="#E0A800", text_color="#000000", font=("Arial", 9, "bold"),
                       width=95, height=62, corner_radius=10,
                       command=self.abrir_modal_resetear).grid(row=2, column=0, columnspan=2, padx=6, pady=6)
@@ -104,7 +104,7 @@ class UsuariosView:
         e_usuario = ctk.CTkEntry(modal, width=260, font=("Arial", 11))
         e_usuario.pack(padx=30)
 
-        ctk.CTkLabel(modal, text="Contrasena:", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(10, 2))
+        ctk.CTkLabel(modal, text="Contraseña:", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(10, 2))
         e_pass = ctk.CTkEntry(modal, width=260, font=("Arial", 11), show="*")
         e_pass.pack(padx=30)
 
@@ -131,25 +131,25 @@ class UsuariosView:
         self._vars_agregar = (var_inv, var_cli, var_ven, var_cat, var_usu, var_res, var_his, var_rep)
         self._combo_rol_agregar = combo_rol
 
-        ctk.CTkCheckBox(chk_frame, text="Modulo Inventario", variable=var_inv, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Clientes", variable=var_cli, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Ventas", variable=var_ven, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Categorias", variable=var_cat, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Usuarios", variable=var_usu, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Respaldos", variable=var_res, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Historial", variable=var_his, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Reportes", variable=var_rep, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Inventario", variable=var_inv, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Clientes", variable=var_cli, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Ventas", variable=var_ven, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Categorías", variable=var_cat, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Usuarios", variable=var_usu, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Respaldos", variable=var_res, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Historial", variable=var_his, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Reportes", variable=var_rep, onvalue=True, offvalue=False).pack(anchor="w")
 
         def guardar():
             usuario = e_usuario.get().strip()
             password = e_pass.get().strip()
             rol = combo_rol.get()
             if not usuario or not password:
-                messagebox.showwarning("Aviso", "Usuario y contrasena son obligatorios", parent=modal)
+                messagebox.showwarning("Aviso", "Usuario y contraseña son obligatorios", parent=modal)
                 return
             ok, msg = validar_complejidad(password)
             if not ok:
-                messagebox.showwarning("Contrasena invalida", msg, parent=modal)
+                messagebox.showwarning("Contraseña inválida", msg, parent=modal)
                 return
             permisos = {
                 "inventario": var_inv.get(),
@@ -162,7 +162,7 @@ class UsuariosView:
                 "reportes": var_rep.get()
             }
             if self.controller.model.agregar_usuario(usuario, password, rol, permisos):
-                messagebox.showinfo("Exito", "Usuario registrado correctamente", parent=modal)
+                messagebox.showinfo("Éxito", "Usuario registrado correctamente", parent=modal)
                 modal.destroy()
                 self.cargar_datos()
 
@@ -179,7 +179,7 @@ class UsuariosView:
     def abrir_modal_actualizar(self):
         seleccion = self.tree.selection()
         if not seleccion:
-            messagebox.showwarning("Seleccion requerida", "Por favor, seleccione un usuario de la tabla para actualizar.")
+            messagebox.showwarning("Selección requerida", "Por favor, seleccione un usuario de la tabla para actualizar.")
             return
 
         valores = self.tree.item(seleccion[0], "values")
@@ -198,11 +198,11 @@ class UsuariosView:
         e_usuario.pack(padx=30)
         e_usuario.insert(0, user_act)
 
-        ctk.CTkLabel(modal, text="Nueva Contrasena (Opcional):", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(10, 2))
+        ctk.CTkLabel(modal, text="Nueva Contraseña (Opcional):", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(10, 2))
         e_pass = ctk.CTkEntry(modal, width=260, font=("Arial", 11), show="*")
         e_pass.pack(padx=30)
 
-        ctk.CTkLabel(modal, text="Contrasena actual del usuario (para cambiar contrasena):", text_color="#FFFFFF",
+        ctk.CTkLabel(modal, text="Contraseña actual del usuario (para cambiar contraseña):", text_color="#FFFFFF",
                      font=("Arial", 10, "bold")).pack(anchor="w", padx=30, pady=(10, 2))
         e_user_pass = ctk.CTkEntry(modal, width=260, font=("Arial", 11), show="*")
         e_user_pass.pack(padx=30)
@@ -230,14 +230,14 @@ class UsuariosView:
         chk_frame = ctk.CTkFrame(modal, fg_color="#333333")
         chk_frame.pack(padx=30, anchor="w")
 
-        ctk.CTkCheckBox(chk_frame, text="Modulo Inventario", variable=var_inv, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Clientes", variable=var_cli, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Ventas", variable=var_ven, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Categorias", variable=var_cat, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Usuarios", variable=var_usu, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Respaldos", variable=var_res, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Historial", variable=var_his, onvalue=True, offvalue=False).pack(anchor="w")
-        ctk.CTkCheckBox(chk_frame, text="Modulo Reportes", variable=var_rep, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Inventario", variable=var_inv, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Clientes", variable=var_cli, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Ventas", variable=var_ven, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Categorías", variable=var_cat, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Usuarios", variable=var_usu, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Respaldos", variable=var_res, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Historial", variable=var_his, onvalue=True, offvalue=False).pack(anchor="w")
+        ctk.CTkCheckBox(chk_frame, text="Módulo Reportes", variable=var_rep, onvalue=True, offvalue=False).pack(anchor="w")
 
         def actualizar():
             usuario = e_usuario.get().strip()
@@ -249,11 +249,11 @@ class UsuariosView:
             if password:
                 ok, msg = validar_complejidad(password)
                 if not ok:
-                    messagebox.showwarning("Contrasena invalida", msg, parent=modal)
+                    messagebox.showwarning("Contraseña inválida", msg, parent=modal)
                     return
                 user_pass = e_user_pass.get()
                 if not self.controller.model.verificar_contrasena(id_usuario, user_pass):
-                    messagebox.showerror("Acceso denegado", "La contrasena actual del usuario es incorrecta.", parent=modal)
+                    messagebox.showerror("Acceso denegado", "La contraseña actual del usuario es incorrecta.", parent=modal)
                     return
             permisos = {
                 "inventario": var_inv.get(),
@@ -267,8 +267,8 @@ class UsuariosView:
             }
             if self.controller.model.actualizar_usuario(id_usuario, usuario, password, rol, permisos):
                 if password:
-                    self.controller.registrar_evento("cambio_contrasena", f"Se cambio la contrasena del usuario {usuario}")
-                messagebox.showinfo("Exito", "Usuario actualizado correctamente", parent=modal)
+                    self.controller.registrar_evento("cambio_contrasena", f"Se cambió la contraseña del usuario {usuario}")
+                messagebox.showinfo("Éxito", "Usuario actualizado correctamente", parent=modal)
                 modal.destroy()
                 self.cargar_datos()
 
@@ -285,30 +285,30 @@ class UsuariosView:
     def abrir_modal_resetear(self):
         seleccion = self.tree.selection()
         if not seleccion:
-            messagebox.showwarning("Seleccion requerida", "Por favor, seleccione un usuario de la tabla para resetear su contrasena.")
+            messagebox.showwarning("Selección requerida", "Por favor, seleccione un usuario de la tabla para resetear su contraseña.")
             return
 
         valores = self.tree.item(seleccion[0], "values")
         id_usuario, usuario = valores[0], valores[1]
         if usuario == self.controller.usuario_actual["usuario"]:
-            messagebox.showerror("Accion no permitida", "No puedes resetear tu propia contrasena desde aqui.")
+            messagebox.showerror("Acción no permitida", "No puedes resetear tu propia contraseña desde aquí.")
             return
 
         modal = ctk.CTkToplevel(self.root)
         traer_al_frente(modal)
         modal.resizable(False, False)
-        modal.title("Resetear Contrasena")
+        modal.title("Resetear Contraseña")
         modal.geometry("380x300")
         modal.configure(fg_color="#333333")
 
-        ctk.CTkLabel(modal, text=f"Resetear contrasena del usuario: {usuario}", text_color="#FFFFFF",
+        ctk.CTkLabel(modal, text=f"Resetear contraseña del usuario: {usuario}", text_color="#FFFFFF",
                      font=("Arial", 11, "bold")).pack(anchor="w", padx=30, pady=(20, 10))
 
-        ctk.CTkLabel(modal, text="Tu contrasena de administrador:", text_color="#FFFFFF", font=("Arial", 10)).pack(anchor="w", padx=30, pady=(0, 2))
+        ctk.CTkLabel(modal, text="Tu contraseña de administrador:", text_color="#FFFFFF", font=("Arial", 10)).pack(anchor="w", padx=30, pady=(0, 2))
         e_admin_pass = ctk.CTkEntry(modal, width=260, font=("Arial", 11), show="*")
         e_admin_pass.pack(padx=30)
 
-        ctk.CTkLabel(modal, text="Nueva contrasena temporal:", text_color="#FFFFFF", font=("Arial", 10)).pack(anchor="w", padx=30, pady=(10, 2))
+        ctk.CTkLabel(modal, text="Nueva contraseña temporal:", text_color="#FFFFFF", font=("Arial", 10)).pack(anchor="w", padx=30, pady=(10, 2))
         e_nueva = ctk.CTkEntry(modal, width=260, font=("Arial", 11), show="*")
         e_nueva.pack(padx=30)
 
@@ -316,31 +316,31 @@ class UsuariosView:
             clave_admin = e_admin_pass.get()
             nueva = e_nueva.get().strip()
             if not clave_admin or not nueva:
-                messagebox.showwarning("Aviso", "Debe ingresar su contrasena y la nueva contrasena temporal", parent=modal)
+                messagebox.showwarning("Aviso", "Debe ingresar su contraseña y la nueva contraseña temporal", parent=modal)
                 return
             ok, msg = validar_complejidad(nueva)
             if not ok:
-                messagebox.showwarning("Contrasena invalida", msg, parent=modal)
+                messagebox.showwarning("Contraseña inválida", msg, parent=modal)
                 return
             if self.controller.resetear_contrasena_usuario(id_usuario, clave_admin, nueva):
                 modal.destroy()
                 self.cargar_datos()
 
-        ctk.CTkButton(modal, text="Resetear Contrasena", fg_color="#E0A800", text_color="#000000",
+        ctk.CTkButton(modal, text="Resetear Contraseña", fg_color="#E0A800", text_color="#000000",
                       font=("Arial", 10, "bold"), command=resetear).pack(pady=20)
 
     def eliminar_seleccionado(self):
         seleccion = self.tree.selection()
         if not seleccion:
-            messagebox.showwarning("Seleccion requerida", "Por favor, seleccione un usuario de la tabla para eliminar.")
+            messagebox.showwarning("Selección requerida", "Por favor, seleccione un usuario de la tabla para eliminar.")
             return
         valores = self.tree.item(seleccion[0], "values")
         id_usuario, usuario = valores[0], valores[1]
         if usuario == self.controller.usuario_actual["usuario"]:
-            messagebox.showerror("Accion no permitida", "No puedes eliminar el usuario con el que estas conectado actualmente.")
+            messagebox.showerror("Acción no permitida", "No puedes eliminar el usuario con el que estás conectado actualmente.")
             return
-        confirmacion = messagebox.askyesno("Confirmar Eliminacion", f"Esta seguro que desea eliminar al usuario '{usuario}'?")
+        confirmacion = messagebox.askyesno("Confirmar Eliminación", f"¿Está seguro que desea eliminar al usuario '{usuario}'?")
         if confirmacion:
             if self.controller.model.eliminar_usuario(id_usuario):
-                messagebox.showinfo("Exito", "Usuario eliminado correctamente")
+                messagebox.showinfo("Éxito", "Usuario eliminado correctamente")
                 self.cargar_datos()

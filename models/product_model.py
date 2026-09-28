@@ -22,7 +22,7 @@ class ProductModel:
             return True
         except mysql.connector.Error as err:
             self.db.rollback()
-            messagebox.showerror("Error Detallado", f"Ocurrio un error al registrar:\n{err}")
+            messagebox.showerror("Error Detallado", f"Ocurrió un error al registrar:\n{err}")
             return False
 
     def tiene_lote_activo(self, id_producto):

@@ -94,10 +94,10 @@ class InventarioView:
         inner_frame = ctk.CTkFrame(table_frame, fg_color="#777777")
         inner_frame.pack(fill="both", expand=True, padx=2, pady=2)
 
-        columns = ("id", "Producto", "Categoria", "Stock")
+        columns = ("id", "Producto", "Categoría", "Stock")
         self.tree = ttk.Treeview(inner_frame, columns=columns, show="headings", height=15)
 
-        headers = ["ID", "Producto", "Categoria", "Stock"]
+        headers = ["ID", "Producto", "Categoría", "Stock"]
         widths = [60, 180, 140, 100]
         anchorings = ["w", "w", "w", "e"]
         for col, head, w, a in zip(columns, headers, widths, anchorings):
@@ -143,7 +143,7 @@ class InventarioView:
     def obtener_producto_seleccionado(self):
         seleccion = self.tree.selection()
         if not seleccion:
-            messagebox.showwarning("Seleccion requerida", "Por favor, seleccione un producto de la tabla primero.")
+            messagebox.showwarning("Selección requerida", "Por favor, seleccione un producto de la tabla primero.")
             return None
         valores = self.tree.item(seleccion[0], "values")
         return {"id": valores[0], "Producto": valores[1], "Categoria": valores[2], "Stock": valores[3]}
@@ -158,7 +158,7 @@ class InventarioView:
 
         categorias = self.controller.model.obtener_categorias()
         if not categorias:
-            messagebox.showwarning("Aviso", "Primero debe registrar al menos una categoria en el modulo de Categorias.", parent=modal)
+            messagebox.showwarning("Aviso", "Primero debe registrar al menos una categoría en el módulo de Categorías.", parent=modal)
             modal.destroy()
             return
 
@@ -182,7 +182,7 @@ class InventarioView:
 
         row_cat = ctk.CTkFrame(body, fg_color="#333333")
         row_cat.pack(fill="x", pady=4)
-        ctk.CTkLabel(row_cat, text="Categoria:", text_color="#FFFFFF", font=("Arial", 11), width=110, anchor="w").pack(side="left")
+        ctk.CTkLabel(row_cat, text="Categoría:", text_color="#FFFFFF", font=("Arial", 11), width=110, anchor="w").pack(side="left")
         combo_cat = ctk.CTkComboBox(row_cat, values=list(cat_dict.keys()), width=240, state="readonly")
         combo_cat.pack(side="left")
         combo_cat.set(list(cat_dict.keys())[0])
@@ -267,17 +267,17 @@ class InventarioView:
                 if stock <= 0:
                     raise ValueError
                 if venta < costo / stock:
-                    messagebox.showerror("Precio invalido",
+                    messagebox.showerror("Precio inválido",
                                          f"El precio por unidad (${venta:.2f}) es menor al costo por unidad (${costo/stock:.2f}).\n"
-                                         f"Esto generaria perdidas.",
+                                         f"Esto generaría pérdidas.",
                                          parent=modal)
                     return
             except ValueError:
-                messagebox.showerror("Error", "Stock debe ser entero positivo, y costo/venta numericos", parent=modal)
+                messagebox.showerror("Error", "Stock debe ser entero positivo, y costo/venta numéricos", parent=modal)
                 return
 
             if self.controller.model.registrar_producto_y_lote(nombre, cat_dict[cat_nombre], stock, costo, venta, venc):
-                messagebox.showinfo("Exito", "Producto y lote registrados con exito", parent=modal)
+                messagebox.showinfo("Éxito", "Producto y lote registrados con éxito", parent=modal)
                 modal.destroy()
                 self.cargar_datos()
 
@@ -312,7 +312,7 @@ class InventarioView:
         e_nombre.pack(padx=30)
         e_nombre.insert(0, prod["Producto"])
 
-        ctk.CTkLabel(modal, text="Categoria:", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(10, 2))
+        ctk.CTkLabel(modal, text="Categoría:", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(10, 2))
         combo_cat = ctk.CTkComboBox(modal, values=list(cat_dict.keys()), width=260, state="readonly")
         combo_cat.pack(padx=30)
         if prod["Categoria"] in cat_dict:
@@ -327,7 +327,7 @@ class InventarioView:
                 messagebox.showwarning("Aviso", "El nombre es obligatorio", parent=modal)
                 return
             if self.controller.model.actualizar_producto(prod["id"], nombre, cat_dict[cat_nombre]):
-                messagebox.showinfo("Exito", "Producto actualizado correctamente", parent=modal)
+                messagebox.showinfo("Éxito", "Producto actualizado correctamente", parent=modal)
                 modal.destroy()
                 self.cargar_datos()
 
@@ -338,11 +338,11 @@ class InventarioView:
         prod = self.obtener_producto_seleccionado()
         if not prod:
             return
-        confirmacion = messagebox.askyesno("Confirmar Eliminacion",
-                                           f"Esta seguro que desea eliminar el producto '{prod['Producto']}'?\nSe eliminaran todos sus lotes asociados.")
+        confirmacion = messagebox.askyesno("Confirmar Eliminación",
+                                           f"¿Está seguro que desea eliminar el producto '{prod['Producto']}'?\nSe eliminarán todos sus lotes asociados.")
         if confirmacion:
             if self.controller.model.eliminar_producto(prod["id"]):
-                messagebox.showinfo("Exito", "Producto eliminado correctamente")
+                messagebox.showinfo("Éxito", "Producto eliminado correctamente")
                 self.cargar_datos()
 
     def abrir_modal_actualizar_lote(self):
@@ -453,17 +453,17 @@ class InventarioView:
                 if stock <= 0:
                     raise ValueError
             except ValueError:
-                messagebox.showerror("Error", "Revise los formatos (Stock entero positivo, Costo/Venta numericos)", parent=modal)
+                messagebox.showerror("Error", "Revise los formatos (Stock entero positivo, Costo/Venta numéricos)", parent=modal)
                 return
 
             if venta < costo / stock:
-                messagebox.showerror("Precio invalido",
-                                     f"El precio por unidad (${venta:.2f}) es menor al costo por unidad (${costo/stock:.2f}).\nEsto generaria perdidas.",
+                messagebox.showerror("Precio inválido",
+                                     f"El precio por unidad (${venta:.2f}) es menor al costo por unidad (${costo/stock:.2f}).\nEsto generaría pérdidas.",
                                      parent=modal)
                 return
 
             if self.controller.model.agregar_lote_a_producto(prod["id"], stock, costo, venta, venc):
-                messagebox.showinfo("Exito", "Lote agregado y stock actualizado correctamente", parent=modal)
+                messagebox.showinfo("Éxito", "Lote agregado y stock actualizado correctamente", parent=modal)
                 modal.destroy()
                 self.cargar_datos()
 
@@ -518,7 +518,7 @@ class InventarioView:
     def abrir_modal_editar_lote(self, tree_orig, prod_orig, modal_orig):
         seleccion = tree_orig.selection()
         if not seleccion:
-            messagebox.showwarning("Seleccion requerida", "Seleccione un lote de la tabla primero.", parent=modal_orig)
+            messagebox.showwarning("Selección requerida", "Seleccione un lote de la tabla primero.", parent=modal_orig)
             return
         vals = tree_orig.item(seleccion[0], "values")
         lote = {"id_lote": vals[0], "stock": vals[1], "costo": vals[2], "precio": vals[3], "vencimiento": vals[4]}
@@ -619,17 +619,17 @@ class InventarioView:
                 if stock <= 0:
                     raise ValueError
             except ValueError:
-                messagebox.showerror("Error", "Revise los formatos (Stock entero positivo, Costo/Precio numericos)", parent=modal)
+                messagebox.showerror("Error", "Revise los formatos (Stock entero positivo, Costo/Precio numéricos)", parent=modal)
                 return
 
             if precio < costo / stock:
-                messagebox.showerror("Precio invalido",
-                                     f"El precio por unidad (${precio:.2f}) es menor al costo por unidad (${costo/stock:.2f}).\nEsto generaria perdidas.",
+                messagebox.showerror("Precio inválido",
+                                     f"El precio por unidad (${precio:.2f}) es menor al costo por unidad (${costo/stock:.2f}).\nEsto generaría pérdidas.",
                                      parent=modal)
                 return
 
             if self.controller.model.actualizar_lote(int(lote["id_lote"]), stock, costo, precio, venc):
-                messagebox.showinfo("Exito", "Lote actualizado correctamente", parent=modal)
+                messagebox.showinfo("Éxito", "Lote actualizado correctamente", parent=modal)
                 modal.destroy()
                 modal_orig.destroy()
                 self.abrir_modal_ver_lotes()

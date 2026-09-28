@@ -77,7 +77,7 @@ def generar_nota_entrega(datos, ruta_salida=None):
         [Paragraph("Cliente:", style_field_title), Paragraph("C.I.:", style_field_title)],
         [Paragraph(f"|  {datos['cliente']}", style_field_val), Paragraph(f"|  {datos['ci']}", style_field_val)],
         [Spacer(1, 4), Spacer(1, 4)],
-        [Paragraph("Metodo Pago:", style_field_title), Paragraph("Telefono:", style_field_title)],
+        [Paragraph("Método de Pago:", style_field_title), Paragraph("Teléfono:", style_field_title)],
         [Paragraph(f"|  {datos['metodo_pago']}", style_field_val), Paragraph(f"|  {datos['telefono']}", style_field_val)]
     ]
     t_cliente = Table(cliente_data, colWidths=[250, 250])
@@ -94,7 +94,7 @@ def generar_nota_entrega(datos, ruta_salida=None):
         return f"{n:.2f}".replace('.', ',')
 
     table_data = [[
-        Paragraph("Descripcion", style_th),
+        Paragraph("Descripción", style_th),
         Paragraph("Cantidad", style_th_r),
         Paragraph("Precio Unit.", style_th_r),
         Paragraph("Descuento", style_th_r),
@@ -157,7 +157,7 @@ def generar_nota_entrega(datos, ruta_salida=None):
     elements.append(t_totales)
     elements.append(Spacer(1, 30))
 
-    elements.append(Paragraph("Documento de control interno - No genera credito fiscal", style_footer))
+    elements.append(Paragraph("Documento de control interno - No genera crédito fiscal", style_footer))
 
     doc.build(elements)
     return ruta_salida

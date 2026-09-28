@@ -11,7 +11,7 @@ class LoginView:
 
         top_bar = ctk.CTkFrame(self.root, fg_color="#5CB85C", height=30)
         top_bar.pack(fill="x", side="top")
-        ctk.CTkLabel(top_bar, text="Inicio de sesion", text_color="#111111", font=("Arial", 10, "bold")).pack(anchor="w", padx=10, pady=5)
+        ctk.CTkLabel(top_bar, text="Inicio de sesión", text_color="#111111", font=("Arial", 10, "bold")).pack(anchor="w", padx=10, pady=5)
 
         container = ctk.CTkFrame(self.root, fg_color="#333333")
         container.pack(fill="both", expand=True)
@@ -24,13 +24,13 @@ class LoginView:
         if os.path.exists(logo_path):
             logo_img = ctk.CTkImage(Image.open(logo_path), size=(400, 178))
             ctk.CTkLabel(left_panel, image=logo_img, text="").pack(pady=(60, 10))
-            ctk.CTkLabel(left_panel, text="Sistema de Gestion de Ventas", text_color="#FFFFFF", font=("Arial", 16, "bold")).pack(pady=5)
-            ctk.CTkLabel(left_panel, text="Barrio Obrero. San Cristobal", text_color="#CCCCCC", font=("Arial", 12)).pack(pady=2)
+            ctk.CTkLabel(left_panel, text="Sistema de Gestión de Ventas", text_color="#FFFFFF", font=("Arial", 16, "bold")).pack(pady=5)
+            ctk.CTkLabel(left_panel, text="Barrio Obrero. San Cristóbal", text_color="#CCCCCC", font=("Arial", 12)).pack(pady=2)
         else:
-            ctk.CTkLabel(left_panel, text="Sistema de Gestion de Ventas", text_color="#FFFFFF", font=("Arial", 18, "bold")).pack(pady=(120, 10))
-            ctk.CTkLabel(left_panel, text="Barrio Obrero. San Cristobal", text_color="#CCCCCC", font=("Arial", 12)).pack(pady=5)
+            ctk.CTkLabel(left_panel, text="Sistema de Gestión de Ventas", text_color="#FFFFFF", font=("Arial", 18, "bold")).pack(pady=(120, 10))
+            ctk.CTkLabel(left_panel, text="Barrio Obrero. San Cristóbal", text_color="#CCCCCC", font=("Arial", 12)).pack(pady=5)
 
-        ctk.CTkLabel(left_panel, text="Aplicacion de escritorio creada por:\nJose Escalante, Giornaldo Gomez, Brandon Correa",
+        ctk.CTkLabel(left_panel, text="Aplicación de escritorio creada por:\nJose Escalante, Giornaldo Gomez, Brandon Correa",
                      text_color="#AAAAAA", font=("Arial", 10), justify="center").pack(pady=40)
 
         separator = ctk.CTkFrame(container, fg_color="#5CB85C", width=2)
@@ -43,13 +43,13 @@ class LoginView:
         form_frame = ctk.CTkFrame(right_panel, fg_color="#383838")
         form_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-        ctk.CTkLabel(form_frame, text="Inicio de sesion", text_color="#FFFFFF", font=("Arial", 20)).pack(pady=(0, 25))
+        ctk.CTkLabel(form_frame, text="Inicio de sesión", text_color="#FFFFFF", font=("Arial", 20)).pack(pady=(0, 25))
 
         ctk.CTkLabel(form_frame, text="Nombre de usuario", text_color="#FFFFFF", font=("Arial", 11)).pack(anchor="w")
         self.entry_user = ctk.CTkEntry(form_frame, font=("Arial", 12), width=235)
         self.entry_user.pack(pady=(5, 15), anchor="w")
 
-        ctk.CTkLabel(form_frame, text="Contrasena", text_color="#FFFFFF", font=("Arial", 11)).pack(anchor="w")
+        ctk.CTkLabel(form_frame, text="Contraseña", text_color="#FFFFFF", font=("Arial", 11)).pack(anchor="w")
 
         ojo_path = os.path.join(assets_dir, "ojo.png")
         invisible_path = os.path.join(assets_dir, "invisible.png")

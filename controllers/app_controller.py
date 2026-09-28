@@ -16,6 +16,17 @@ from views.inventario_view import InventarioView
 from views.historial_view import HistorialView
 from views.reportes_view import ReportesView
 
+NOMBRES_MODULOS = {
+    "inventario": "Inventario",
+    "clientes": "Clientes",
+    "ventas": "Ventas",
+    "categorias": "Categorías",
+    "usuarios": "Usuarios",
+    "respaldos": "Respaldos",
+    "historial": "Historial",
+    "reportes": "Reportes",
+}
+
 
 class AppController:
     def __init__(self):
@@ -65,7 +76,7 @@ class AppController:
     def verificar_permiso_o_rechazar(self, modulo):
         if self.verificar_permiso(modulo):
             return True
-        messagebox.showerror("Acceso Denegado", f"No tienes permisos para acceder al modulo de {modulo.capitalize()}.")
+        messagebox.showerror("Acceso Denegado", f"No tienes permisos para acceder al módulo de {NOMBRES_MODULOS.get(modulo, modulo)}.")
         return False
 
     def show_login(self):
@@ -139,41 +150,41 @@ class AppController:
         if not self.usuario_actual:
             return False
         if id_usuario == self.usuario_actual["id_usuario"]:
-            messagebox.showerror("Accion no permitida", "No puedes resetear tu propia contrasena desde aqui.")
+            messagebox.showerror("Acción no permitida", "No puedes resetear tu propia contraseña desde aquí.")
             return False
         if not self.model.verificar_contrasena(self.usuario_actual["id_usuario"], clave_admin):
-            messagebox.showerror("Clave incorrecta", "La contrasena del administrador es incorrecta.")
+            messagebox.showerror("Clave incorrecta", "La contraseña del administrador es incorrecta.")
             return False
         if self.model.resetear_contrasena(id_usuario, nueva_contrasena):
-            self.registrar_evento("reset_contrasena", f"El administrador reseteo la contrasena al usuario (ID {id_usuario})")
-            messagebox.showinfo("Contrasena reseteada", "La contrasena fue reseteada. El usuario debera cambiarla en su proximo ingreso.")
+            self.registrar_evento("reset_contrasena", f"El administrador reseteó la contraseña al usuario (ID {id_usuario})")
+            messagebox.showinfo("Contraseña reseteada", "La contraseña fue reseteada. El usuario deberá cambiarla en su próximo ingreso.")
             return True
         return False
 
     def procesar_login(self, usuario, contrasena):
         if not usuario or not contrasena:
-            messagebox.showwarning("Campos vacios", "Por favor ingrese usuario y contrasena.")
+            messagebox.showwarning("Campos vacíos", "Por favor ingrese usuario y contraseña.")
             return
 
         resultado = self.model.intentar_login(usuario, contrasena)
         if resultado["estado"] == "ok":
             self.usuario_actual = resultado["usuario"]
-            self.registrar_evento("login", f"El usuario {usuario} inicio sesion")
+            self.registrar_evento("login", f"El usuario {usuario} inició sesión")
             if self.usuario_actual.get("cambio_obligatorio"):
                 self.show_cambio_password()
                 return
             self.show_panel()
             self.verificar_alertas_automaticas()
         elif resultado["estado"] == "bloqueado":
-            messagebox.showerror("Cuenta Bloqueada", f"Demasiados intentos fallidos. La cuenta sera bloqueada por {resultado['minutos']} minuto(s). Intente mas tarde.")
+            messagebox.showerror("Cuenta Bloqueada", f"Demasiados intentos fallidos. La cuenta será bloqueada por {resultado['minutos']} minuto(s). Intente más tarde.")
         else:
-            mensaje = "Usuario o contrasena incorrectos."
+            mensaje = "Usuario o contraseña incorrectos."
             if resultado.get("restantes") is not None:
                 mensaje += f" Le restan {resultado['restantes']} intento(s)."
             messagebox.showerror("Error de Acceso", mensaje)
 
     def cerrar_sesion(self):
-        self.registrar_evento("logout", f"El usuario {self.usuario_actual.get('usuario')} cerro sesion" if self.usuario_actual else None)
+        self.registrar_evento("logout", f"El usuario {self.usuario_actual.get('usuario')} cerró sesión" if self.usuario_actual else None)
         self.usuario_actual = None
         self.root.geometry("900x550")
         self.root.update_idletasks()
@@ -190,23 +201,23 @@ class AppController:
         top = ctk.CTkToplevel(self.root)
         traer_al_frente(top)
         top.resizable(False, False)
-        top.title("Alerta de Vencimiento Proximo")
+        top.title("Alerta de Vencimiento Próximo")
         top.geometry("500x300")
         top.configure(fg_color="#333333")
 
-        ctk.CTkLabel(top, text="Lotes proximos a vencer (< 90 dias)!", text_color="#FF5555", font=("Arial", 12, "bold")).pack(pady=10)
+        ctk.CTkLabel(top, text="Lotes próximos a vencer (< 90 días)!", text_color="#FF5555", font=("Arial", 12, "bold")).pack(pady=10)
 
         frame_t = ctk.CTkFrame(top, fg_color="transparent")
         frame_t.pack(fill="both", expand=True, padx=10, pady=10)
 
-        tree = ttk.Treeview(frame_t, columns=("Producto", "Stock", "Vencimiento", "Dias"), show="headings", height=5)
-        for col in ("Producto", "Stock", "Vencimiento", "Dias"):
+        tree = ttk.Treeview(frame_t, columns=("Producto", "Stock", "Vencimiento", "Días"), show="headings", height=5)
+        for col in ("Producto", "Stock", "Vencimiento", "Días"):
             tree.heading(col, text=col)
             tree.column(col, width=105, anchor="w")
         tree.pack(fill="both", expand=True)
 
         for a in alertas:
-            tree.insert("", "end", values=(a["Producto"], a["Stock"], a["Vencimiento"], f"{a['Dias_Restantes']} dias"))
+            tree.insert("", "end", values=(a["Producto"], a["Stock"], a["Vencimiento"], f"{a['Dias_Restantes']} días"))
 
         ctk.CTkButton(top, text="Ver en inventario", fg_color="#5CB85C", text_color="#000000", font=("Arial", 10, "bold"),
                       command=lambda: [top.destroy(), self.show_inventario()]).pack(pady=10)

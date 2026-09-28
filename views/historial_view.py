@@ -39,11 +39,11 @@ class HistorialView:
         scroll_h.pack(side="bottom", fill="x", padx=10, pady=(0, 10))
 
         self.tipos = {
-            "login": "Inicio de Sesion",
-            "logout": "Cierre de Sesion",
-            "venta": "Venta realizadas",
-            "cambio_contrasena": "Cambio de Contrasena",
-            "reset_contrasena": "Reset de Contrasena",
+            "login": "Inicio de Sesión",
+            "logout": "Cierre de Sesión",
+            "venta": "Ventas Realizadas",
+            "cambio_contrasena": "Cambio de Contraseña",
+            "reset_contrasena": "Reset de Contraseña",
             "respaldo": "Copias de Seguridad"
         }
 

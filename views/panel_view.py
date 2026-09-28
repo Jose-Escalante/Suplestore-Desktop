@@ -44,7 +44,7 @@ class PanelView:
             ("ventas", "Ventas", "ventas", controller.show_ventas),
             ("usuarios", "Usuarios", "usuarios", controller.show_usuarios),
             ("historial", "Historial", "inventario_historial_lotes", controller.show_historial),
-            ("categorias", "Categorias", "categorias", controller.show_categorias),
+            ("categorias", "Categorías", "categorias", controller.show_categorias),
             ("reportes", "Reportes", "ventas_ver_ventas", controller.show_reportes),
             ("respaldos", "Respaldo BD", "inventario_registrar", self.abrir_modal_respaldo),
         ]
@@ -66,7 +66,7 @@ class PanelView:
         cerrar_frame = ctk.CTkFrame(container, fg_color="#3B3B3B")
         cerrar_frame.pack(fill="x", pady=(10, 20))
 
-        ctk.CTkButton(cerrar_frame, text="Cerrar Sesion", fg_color="#E0E0E0", text_color="#000000", font=("Arial", 11, "bold"),
+        ctk.CTkButton(cerrar_frame, text="Cerrar Sesión", fg_color="#E0E0E0", text_color="#000000", font=("Arial", 11, "bold"),
                       width=140, height=32, corner_radius=6,
                       command=controller.cerrar_sesion).pack(side="right", padx=30)
 
@@ -96,21 +96,21 @@ class PanelView:
             if not ruta:
                 return
             if self.controller.model.exportar_respaldo(ruta):
-                self.controller.registrar_evento("respaldo", f"Se exporto un respaldo de la base de datos")
-                messagebox.showinfo("Exito", f"Respaldo exportado en:\n{ruta}", parent=modal)
+                self.controller.registrar_evento("respaldo", "Se exportó un respaldo de la base de datos")
+                messagebox.showinfo("Éxito", f"Respaldo exportado en:\n{ruta}", parent=modal)
 
         def importar():
             ruta = filedialog.askopenfilename(parent=modal, filetypes=[("SQL", "*.sql"), ("Todos", "*.*")])
             if not ruta:
                 return
-            confirmacion = messagebox.askyesno("Confirmacion",
-                                               "Al importar un respaldo se REEMPLAZARA toda la informacion actual.\n\n"
-                                               "Esta seguro que desea continuar?", parent=modal)
+            confirmacion = messagebox.askyesno("Confirmación",
+                                               "Al importar un respaldo se REEMPLAZARA toda la información actual.\n\n"
+                                               "¿Está seguro que desea continuar?", parent=modal)
             if not confirmacion:
                 return
             if self.controller.model.importar_respaldo(ruta):
-                self.controller.registrar_evento("respaldo", "Se importo un respaldo de la base de datos")
-                messagebox.showinfo("Exito", "Respaldo importado correctamente.", parent=modal)
+                self.controller.registrar_evento("respaldo", "Se importó un respaldo de la base de datos")
+                messagebox.showinfo("Éxito", "Respaldo importado correctamente.", parent=modal)
 
         btn_row = ctk.CTkFrame(modal, fg_color="#333333")
         btn_row.pack(pady=10)

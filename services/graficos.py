@@ -99,7 +99,7 @@ def _inactivos(filas, ancho_px=None):
     if not valores:
         return None
     etiquetas = [e[:24] for e in etiquetas]
-    fig, ax = _base("Dias Sin Comprar", ancho_px)
+    fig, ax = _base("Días Sin Comprar", ancho_px)
     ax.grid(axis="x", color="none")
     ax.bar(etiquetas, valores, color=colores, width=0.35)
     if len(valores) == 1:
@@ -111,12 +111,12 @@ def _inactivos(filas, ancho_px=None):
 
 
 TIPOS_CON_GRAFICO = {
-    "Ventas por Periodo",
-    "Productos mas Vendidos",
+    "Ventas por Período",
+    "Productos más Vendidos",
     "Productos menos Vendidos",
     "Ventas por Cliente",
     "Ventas por Vendedor",
-    "Ventas por Metodo de Pago",
+    "Ventas por Método de Pago",
     "Descuentos Aplicados",
     "Productos con Stock Bajo",
     "Clientes Inactivos",
@@ -127,12 +127,12 @@ TIPOS_CON_GRAFICO = {
 def crear_grafico(tipo, filas, periodo_label="", ancho_px=None):
     if not GRAFICOS_OK or not filas or tipo not in TIPOS_CON_GRAFICO:
         return None
-    if tipo == "Ventas por Periodo":
-        es_anio = periodo_label == "Ultimo anio"
-        titulo = "Ventas por Mes" if es_anio else "Ventas por Dia"
+    if tipo == "Ventas por Período":
+        es_anio = periodo_label == "Último año"
+        titulo = "Ventas por Mes" if es_anio else "Ventas por Día"
         return _vertical(filas, "dia", "total", titulo, periodo_label, es_dinero=True,
                          rotacion=25 if es_anio else 0, ancho_px=ancho_px, etiquetas_mes=es_anio)
-    if tipo == "Productos mas Vendidos":
+    if tipo == "Productos más Vendidos":
         return _vertical(filas, "nombre_producto", "unidades", "Unidades Vendidas por Producto", rotacion=30, ancho_px=ancho_px)
     if tipo == "Productos menos Vendidos":
         return _vertical(filas, "nombre_producto", "unidades", "Unidades por Producto", rotacion=30, ancho_px=ancho_px)
@@ -140,8 +140,8 @@ def crear_grafico(tipo, filas, periodo_label="", ancho_px=None):
         return _vertical(filas, "nombre", "total", "Ventas por Cliente", es_dinero=True, rotacion=30, ancho_px=ancho_px)
     if tipo == "Ventas por Vendedor":
         return _vertical(filas, "usuario", "notas", "Cantidad de Ventas por Vendedor", rotacion=30, ancho_px=ancho_px)
-    if tipo == "Ventas por Metodo de Pago":
-        return _vertical(filas, "metodo_pago", "total", "Ventas por Metodo de Pago", es_dinero=True, rotacion=30, ancho_px=ancho_px)
+    if tipo == "Ventas por Método de Pago":
+        return _vertical(filas, "metodo_pago", "total", "Ventas por Método de Pago", es_dinero=True, rotacion=30, ancho_px=ancho_px)
     if tipo == "Descuentos Aplicados":
         return _descuentos(filas, ancho_px)
     if tipo == "Productos con Stock Bajo":
@@ -153,7 +153,7 @@ def crear_grafico(tipo, filas, periodo_label="", ancho_px=None):
             {**f, "etiqueta": f"{f['nombre_producto']} (L{f['lote']})"}
             for f in filas
         ]
-        return _vertical(filas_aux, "etiqueta", "dias", "Dias Restantes para Vencer", rotacion=30, alerta_dias=True, ancho_px=ancho_px)
+        return _vertical(filas_aux, "etiqueta", "dias", "Días Restantes para Vencer", rotacion=30, alerta_dias=True, ancho_px=ancho_px)
     return None
 
 

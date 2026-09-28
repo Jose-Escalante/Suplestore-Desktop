@@ -257,12 +257,12 @@ class VentasView:
 
     def agregar_item(self):
         if self.cliente_id_seleccionado is None:
-            messagebox.showwarning("Cliente", "Seleccione un cliente valido antes de agregar productos al carrito.")
+            messagebox.showwarning("Cliente", "Seleccione un cliente válido antes de agregar productos al carrito.")
             return
 
         seleccion_prod = self.combo_productos.get()
         if not seleccion_prod or seleccion_prod not in self.productos_dict:
-            messagebox.showwarning("Seleccion", "Seleccione un producto valido.")
+            messagebox.showwarning("Selección", "Seleccione un producto válido.")
             return
 
         item_db = self.productos_dict[seleccion_prod]
@@ -277,7 +277,7 @@ class VentasView:
             if cantidad <= 0 or cantidad > stock_disp:
                 raise ValueError()
         except ValueError:
-            messagebox.showerror("Error", f"Cantidad invalida o supera el stock disponible ({stock_disp}).")
+            messagebox.showerror("Error", f"Cantidad inválida o supera el stock disponible ({stock_disp}).")
             return
 
         lotes = self.controller.model.obtener_lotes_por_producto(item_db['id'])
@@ -312,7 +312,7 @@ class VentasView:
     def editar_item(self):
         seleccion = self.tree_carrito.selection()
         if not seleccion:
-            messagebox.showwarning("Seleccion", "Seleccione un producto del carrito para editar su cantidad.")
+            messagebox.showwarning("Selección", "Seleccione un producto del carrito para editar su cantidad.")
             return
 
         index = self.tree_carrito.index(seleccion[0])
@@ -345,7 +345,7 @@ class VentasView:
                                            f"La cantidad supera el stock disponible ({stock_disp}).", parent=modal)
                     return
             except ValueError:
-                messagebox.showerror("Error", "Ingrese una cantidad valida mayor a cero.", parent=modal)
+                messagebox.showerror("Error", "Ingrese una cantidad válida mayor a cero.", parent=modal)
                 return
             item_actual['cantidad'] = nueva_cant
             self._recalcular_item(item_actual)
@@ -358,7 +358,7 @@ class VentasView:
     def quitar_item(self):
         seleccion = self.tree_carrito.selection()
         if not seleccion:
-            messagebox.showwarning("Seleccion", "Seleccione un producto del carrito para eliminar.")
+            messagebox.showwarning("Selección", "Seleccione un producto del carrito para eliminar.")
             return
         index = self.tree_carrito.index(seleccion[0])
         del self.carrito_items[index]
@@ -393,7 +393,7 @@ class VentasView:
     def descuento_item(self):
         seleccion = self.tree_carrito.selection()
         if not seleccion:
-            messagebox.showwarning("Seleccion", "Seleccione un producto del carrito para aplicarle un descuento.")
+            messagebox.showwarning("Selección", "Seleccione un producto del carrito para aplicarle un descuento.")
             return
         index = self.tree_carrito.index(seleccion[0])
         item_actual = self.carrito_items[index]
@@ -426,7 +426,7 @@ class VentasView:
                 if valor < 0:
                     raise ValueError
             except ValueError:
-                messagebox.showerror("Error", "Ingrese un valor de descuento valido.", parent=modal)
+                messagebox.showerror("Error", "Ingrese un valor de descuento válido.", parent=modal)
                 return
             if combo_tipo.get() == "Porcentaje (%)":
                 if valor > 100:
@@ -449,7 +449,7 @@ class VentasView:
 
     def abrir_modal_pagar(self):
         if not self.carrito_items:
-            messagebox.showwarning("Carrito Vacio", "No hay productos en el carrito para procesar el pago.")
+            messagebox.showwarning("Carrito Vacío", "No hay productos en el carrito para procesar el pago.")
             return
 
         modal = ctk.CTkToplevel(self.root)
@@ -459,10 +459,10 @@ class VentasView:
         modal.geometry("380x360")
         modal.configure(fg_color="#333333")
 
-        ctk.CTkLabel(modal, text="Seleccione Metodo de Pago", text_color="#FFFFFF",
+        ctk.CTkLabel(modal, text="Seleccione Método de Pago", text_color="#FFFFFF",
                      font=("Arial", 12, "bold")).pack(pady=10)
 
-        combo_metodo = ctk.CTkComboBox(modal, values=["Efectivo ($)", "Punto de Venta", "Pago Movil"],
+        combo_metodo = ctk.CTkComboBox(modal, values=["Efectivo ($)", "Punto de Venta", "Pago Móvil"],
                                        width=260, state="readonly", font=("Arial", 11))
         combo_metodo.pack(pady=5)
         combo_metodo.set("Efectivo ($)")
@@ -493,14 +493,14 @@ class VentasView:
 
         def confirmar_pago():
             if self.cliente_id_seleccionado is None:
-                messagebox.showwarning("Cliente", "Seleccione un cliente valido.", parent=modal)
+                messagebox.showwarning("Cliente", "Seleccione un cliente válido.", parent=modal)
                 return
             try:
                 desc_val = float(entry_desc.get().strip())
                 if desc_val < 0:
                     raise ValueError
             except ValueError:
-                messagebox.showerror("Error", "Ingrese un descuento valido.", parent=modal)
+                messagebox.showerror("Error", "Ingrese un descuento válido.", parent=modal)
                 return
             if combo_desc_tipo.get() == "Porcentaje (%)":
                 if desc_val > 100:
@@ -537,7 +537,7 @@ class VentasView:
                     messagebox.showwarning("Monto Insuficiente", "El monto cancelado es menor al total a pagar.", parent=modal)
                     return
             except ValueError:
-                messagebox.showerror("Error", "Ingrese un monto cancelado valido.", parent=modal)
+                messagebox.showerror("Error", "Ingrese un monto cancelado válido.", parent=modal)
                 return
 
             id_cliente = self.cliente_id_seleccionado
@@ -556,8 +556,8 @@ class VentasView:
                 cl_data = self.clientes_data.get(id_cliente, {})
                 fecha_actual = datetime.now().strftime("%d/%m/%Y")
                 datos_nota = {
-                    "empresa": "Suplestore Tachira",
-                    "direccion": "Centro Comercial Boulevard\nLos Mangos, Local 34, Barrio\nObrero. San Cristobal, Estado\nTachira.",
+                    "empresa": "Suplestore Táchira",
+                    "direccion": "Centro Comercial Boulevard\nLos Mangos, Local 34, Barrio\nObrero. San Cristóbal, Estado\nTáchira.",
                     "num_nota": resultado["numero_control"],
                     "fecha": fecha_actual,
                     "cliente": " ".join(filter(None, [cl_data.get("nombre", ""), cl_data.get("apellido", "")])),
@@ -578,7 +578,7 @@ class VentasView:
                 ruta_pdf = generar_nota_entrega(datos_nota)
                 os.startfile(ruta_pdf)
                 vuelto = monto_cancelado - total_final
-                messagebox.showinfo("Exito", f"Nota de Entrega registrada con exito.\nN de Nota: {resultado['numero_control']}\nVuelto: ${vuelto:.2f}", parent=modal)
+                messagebox.showinfo("Éxito", f"Nota de Entrega registrada con éxito.\nN de Nota: {resultado['numero_control']}\nVuelto: ${vuelto:.2f}", parent=modal)
                 modal.destroy()
                 self.controller.show_ventas()
 
@@ -598,13 +598,13 @@ class VentasView:
 
         search_row = ctk.CTkFrame(modal, fg_color="#333333")
         search_row.pack(fill="x", padx=15, pady=(0, 5))
-        ctk.CTkLabel(search_row, text="Cedula:", text_color="#FFFFFF", font=("Arial", 11)).pack(side="left", padx=(0, 5))
+        ctk.CTkLabel(search_row, text="Cédula:", text_color="#FFFFFF", font=("Arial", 11)).pack(side="left", padx=(0, 5))
         entry_cedula = ctk.CTkEntry(search_row, font=("Arial", 11), width=160)
         entry_cedula.pack(side="left", padx=(0, 8))
 
-        ctk.CTkLabel(search_row, text="Periodo:", text_color="#FFFFFF", font=("Arial", 11)).pack(side="left", padx=(0, 5))
+        ctk.CTkLabel(search_row, text="Período:", text_color="#FFFFFF", font=("Arial", 11)).pack(side="left", padx=(0, 5))
         combo_periodo = ctk.CTkComboBox(search_row,
-                                        values=["Todas", "Hoy", "Ultima Semana", "Ultimo Mes", "Ultimo Ano"],
+                                        values=["Todas", "Hoy", "Última Semana", "Último Mes", "Último Año"],
                                         width=140, font=("Arial", 11), command=lambda _sel: _aplicar_filtros())
         combo_periodo.set("Todas")
         combo_periodo.pack(side="left", padx=(0, 8))
@@ -641,7 +641,7 @@ class VentasView:
                 f[4] = f[4].replace("$", "")
                 f[6] = f[6].replace("$", "")
             exportar_ventas_xlsx(ruta, headers, filas)
-            messagebox.showinfo("Exito", f"Ventas exportadas en:\n{ruta}", parent=modal)
+            messagebox.showinfo("Éxito", f"Ventas exportadas en:\n{ruta}", parent=modal)
 
         ventas_completas = self.controller.model.obtener_historial_ventas()
 
@@ -651,11 +651,11 @@ class VentasView:
             inicio = None
             if opcion == "Hoy":
                 inicio = ahora.replace(hour=0, minute=0, second=0, microsecond=0)
-            elif opcion == "Ultima Semana":
+            elif opcion == "Última Semana":
                 inicio = ahora - timedelta(days=6)
-            elif opcion == "Ultimo Mes":
+            elif opcion == "Último Mes":
                 inicio = ahora - timedelta(days=29)
-            elif opcion == "Ultimo Ano":
+            elif opcion == "Último Año":
                 inicio = ahora - timedelta(days=364)
             filtradas = ventas_completas
             if inicio is not None:
@@ -688,7 +688,7 @@ class VentasView:
         columns = ("id", "cliente", "vendedor", "pago", "total", "descuento", "cancelado", "fecha")
         tree = ttk.Treeview(frame_t, columns=columns, show="headings", height=12, selectmode="browse")
 
-        headers = ["N Nota", "Cliente", "Vendedor", "Metodo Pago", "Total ($)", "Descuento general (%)", "Cancelado ($)", "Fecha y Hora"]
+        headers = ["N Nota", "Cliente", "Vendedor", "Método Pago", "Total ($)", "Descuento general (%)", "Cancelado ($)", "Fecha y Hora"]
         widths = [90, 115, 85, 90, 80, 130, 90, 130]
         for col, head, w in zip(columns, headers, widths):
             tree.heading(col, text=head)
@@ -710,7 +710,7 @@ class VentasView:
         def ver_detalles():
             seleccion = tree.selection()
             if not seleccion:
-                messagebox.showwarning("Seleccion", "Por favor seleccione una nota de entrega para ver sus detalles.", parent=modal)
+                messagebox.showwarning("Selección", "Por favor seleccione una nota de entrega para ver sus detalles.", parent=modal)
                 return
             id_nota = int(seleccion[0])
 
@@ -753,19 +753,19 @@ class VentasView:
         def reimprimir():
             seleccion = tree.selection()
             if not seleccion:
-                messagebox.showwarning("Seleccion", "Seleccione una nota de entrega para reimprimir.", parent=modal)
+                messagebox.showwarning("Selección", "Seleccione una nota de entrega para reimprimir.", parent=modal)
                 return
             id_nota = int(seleccion[0])
             cabecera = self.controller.model.obtener_nota_cabecera(id_nota)
             if not cabecera:
-                messagebox.showerror("Error", "No se encontro la nota de entrega.", parent=modal)
+                messagebox.showerror("Error", "No se encontró la nota de entrega.", parent=modal)
                 return
             detalles = self.controller.model.obtener_detalles_nota(id_nota)
             fecha = cabecera["fecha_hora"]
             fecha_texto = fecha.strftime("%d/%m/%Y") if hasattr(fecha, "strftime") else str(fecha)
             datos_nota = {
-                "empresa": "Suplestore Tachira",
-                "direccion": "Centro Comercial Boulevard\nLos Mangos, Local 34, Barrio\nObrero. San Cristobal, Estado\nTachira.",
+                "empresa": "Suplestore Táchira",
+                "direccion": "Centro Comercial Boulevard\nLos Mangos, Local 34, Barrio\nObrero. San Cristóbal, Estado\nTáchira.",
                 "num_nota": cabecera["numero_control"],
                 "fecha": fecha_texto,
                 "cliente": cabecera["cliente"],
@@ -789,12 +789,12 @@ class VentasView:
         def descargar():
             seleccion = tree.selection()
             if not seleccion:
-                messagebox.showwarning("Seleccion", "Seleccione una nota de entrega para descargar el PDF.", parent=modal)
+                messagebox.showwarning("Selección", "Seleccione una nota de entrega para descargar el PDF.", parent=modal)
                 return
             id_nota = int(seleccion[0])
             cabecera = self.controller.model.obtener_nota_cabecera(id_nota)
             if not cabecera:
-                messagebox.showerror("Error", "No se encontro la nota de entrega.", parent=modal)
+                messagebox.showerror("Error", "No se encontró la nota de entrega.", parent=modal)
                 return
             ruta = filedialog.asksaveasfilename(parent=modal, defaultextension=".pdf",
                                                 filetypes=[("PDF", "*.pdf")],
@@ -805,8 +805,8 @@ class VentasView:
             fecha = cabecera["fecha_hora"]
             fecha_texto = fecha.strftime("%d/%m/%Y") if hasattr(fecha, "strftime") else str(fecha)
             datos_nota = {
-                "empresa": "Suplestore Tachira",
-                "direccion": "Centro Comercial Boulevard\nLos Mangos, Local 34, Barrio\nObrero. San Cristobal, Estado\nTachira.",
+                "empresa": "Suplestore Táchira",
+                "direccion": "Centro Comercial Boulevard\nLos Mangos, Local 34, Barrio\nObrero. San Cristóbal, Estado\nTáchira.",
                 "num_nota": cabecera["numero_control"],
                 "fecha": fecha_texto,
                 "cliente": cabecera["cliente"],
@@ -825,7 +825,7 @@ class VentasView:
                           for d in detalles]
             }
             ruta_pdf = generar_nota_entrega(datos_nota, ruta_salida=ruta)
-            messagebox.showinfo("Exito", f"Nota de entrega descargada en:\n{ruta_pdf}", parent=modal)
+            messagebox.showinfo("Éxito", f"Nota de entrega descargada en:\n{ruta_pdf}", parent=modal)
 
         btn_row = ctk.CTkFrame(modal, fg_color="#333333")
         btn_row.pack(fill="x", padx=15, pady=(0, 8))

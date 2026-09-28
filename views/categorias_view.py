@@ -10,7 +10,7 @@ class CategoriasView:
 
         top_bar = ctk.CTkFrame(self.root, fg_color="#5CB85C", height=30)
         top_bar.pack(fill="x", side="top")
-        ctk.CTkLabel(top_bar, text="Gestion de Categorias", text_color="#111111", font=("Arial", 10, "bold")).pack(anchor="w", padx=10, pady=5)
+        ctk.CTkLabel(top_bar, text="Gestión de Categorías", text_color="#111111", font=("Arial", 10, "bold")).pack(anchor="w", padx=10, pady=5)
 
         container = ctk.CTkFrame(self.root, fg_color="#333333")
         container.pack(fill="both", expand=True, padx=20, pady=20)
@@ -21,7 +21,7 @@ class CategoriasView:
         columns = ("id", "nombre")
         self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=15)
 
-        headers = ["ID", "Nombre de Categoria"]
+        headers = ["ID", "Nombre de Categoría"]
         for col, head in zip(columns, headers):
             self.tree.heading(col, text=head)
             self.tree.column(col, width=250, anchor="w")
@@ -50,11 +50,11 @@ class CategoriasView:
         modal = ctk.CTkToplevel(self.root)
         traer_al_frente(modal)
         modal.resizable(False, False)
-        modal.title("Registrar Nueva Categoria")
+        modal.title("Registrar Nueva Categoría")
         modal.geometry("350x230")
         modal.configure(fg_color="#333333")
 
-        ctk.CTkLabel(modal, text="Nombre de la Categoria:", text_color="#FFFFFF", font=("Arial", 11)).pack(anchor="w", padx=30, pady=(20, 5))
+        ctk.CTkLabel(modal, text="Nombre de la Categoría:", text_color="#FFFFFF", font=("Arial", 11)).pack(anchor="w", padx=30, pady=(20, 5))
         entry_cat = ctk.CTkEntry(modal, font=("Arial", 11), width=220)
         entry_cat.pack(padx=30)
 
@@ -62,24 +62,24 @@ class CategoriasView:
             nombre = entry_cat.get().strip()
             if nombre:
                 if self.controller.model.agregar_categoria(nombre):
-                    messagebox.showinfo("Exito", "Categoria agregada correctamente", parent=modal)
+                    messagebox.showinfo("Éxito", "Categoría agregada correctamente", parent=modal)
                     modal.destroy()
                     self.cargar_datos()
             else:
-                messagebox.showwarning("Aviso", "Ingrese un nombre valido", parent=modal)
+                messagebox.showwarning("Aviso", "Ingrese un nombre válido", parent=modal)
 
-        ctk.CTkButton(modal, text="Guardar Categoria", fg_color="#5CB85C", text_color="#000000", font=("Arial", 10, "bold"),
+        ctk.CTkButton(modal, text="Guardar Categoría", fg_color="#5CB85C", text_color="#000000", font=("Arial", 10, "bold"),
                       command=guardar).pack(pady=20)
 
     def eliminar_seleccionada(self):
         seleccion = self.tree.selection()
         if not seleccion:
-            messagebox.showwarning("Seleccion requerida", "Por favor, seleccione una categoria de la tabla para eliminar.")
+            messagebox.showwarning("Selección requerida", "Por favor, seleccione una categoría de la tabla para eliminar.")
             return
         valores = self.tree.item(seleccion[0], "values")
         id_categoria, nombre = valores[0], valores[1]
-        confirmacion = messagebox.askyesno("Confirmar Eliminacion", f"Esta seguro que desea eliminar la categoria '{nombre}'?")
+        confirmacion = messagebox.askyesno("Confirmar Eliminación", f"¿Está seguro que desea eliminar la categoría '{nombre}'?")
         if confirmacion:
             if self.controller.model.eliminar_categoria(id_categoria):
-                messagebox.showinfo("Exito", "Categoria eliminada correctamente")
+                messagebox.showinfo("Éxito", "Categoría eliminada correctamente")
                 self.cargar_datos()
