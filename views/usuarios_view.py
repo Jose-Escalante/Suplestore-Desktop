@@ -95,9 +95,9 @@ class UsuariosView:
     def abrir_modal_agregar(self):
         modal = ctk.CTkToplevel(self.root)
         traer_al_frente(modal)
-        modal.resizable(False, False)
+        modal.resizable(True, True)
         modal.title("Registrar Nuevo Usuario")
-        modal.geometry("400x520")
+        modal.geometry("400x560")
         modal.configure(fg_color="#333333")
 
         ctk.CTkLabel(modal, text="Usuario:", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(15, 2))
@@ -188,9 +188,9 @@ class UsuariosView:
 
         modal = ctk.CTkToplevel(self.root)
         traer_al_frente(modal)
-        modal.resizable(False, False)
+        modal.resizable(True, True)
         modal.title("Actualizar Usuario")
-        modal.geometry("400x520")
+        modal.geometry("400x620")
         modal.configure(fg_color="#333333")
 
         ctk.CTkLabel(modal, text="Usuario:", text_color="#FFFFFF").pack(anchor="w", padx=30, pady=(15, 2))
