@@ -38,46 +38,30 @@ class PanelView:
         grid_frame.grid_columnconfigure(1, weight=1)
         grid_frame.grid_columnconfigure(2, weight=1)
 
-        ctk.CTkButton(grid_frame, text="Inventario", image=icon("inventario"), compound="left",
-                      fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),
-                      width=btn_width, height=btn_height, corner_radius=8,
-                      command=controller.show_inventario).grid(row=0, column=0, padx=5, pady=8)
+        modulos = [
+            ("inventario", "Inventario", "inventario", controller.show_inventario),
+            ("clientes", "Clientes", "clientes", controller.show_clientes),
+            ("ventas", "Ventas", "ventas", controller.show_ventas),
+            ("usuarios", "Usuarios", "usuarios", controller.show_usuarios),
+            ("historial", "Historial", "inventario_historial_lotes", controller.show_historial),
+            ("categorias", "Categorias", "categorias", controller.show_categorias),
+            ("reportes", "Reportes", "ventas_ver_ventas", controller.show_reportes),
+            ("respaldos", "Respaldo BD", "inventario_registrar", self.abrir_modal_respaldo),
+        ]
 
-        ctk.CTkButton(grid_frame, text="Clientes", image=icon("clientes"), compound="left",
-                      fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),
-                      width=btn_width, height=btn_height, corner_radius=8,
-                      command=controller.show_clientes).grid(row=0, column=1, padx=5, pady=8)
-
-        ctk.CTkButton(grid_frame, text="Ventas", image=icon("ventas"), compound="left",
-                      fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),
-                      width=btn_width, height=btn_height, corner_radius=8,
-                      command=controller.show_ventas).grid(row=0, column=2, padx=5, pady=8)
-
-        ctk.CTkButton(grid_frame, text="Usuarios", image=icon("usuarios"), compound="left",
-                      fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),
-                      width=btn_width, height=btn_height, corner_radius=8,
-                      command=controller.show_usuarios).grid(row=1, column=0, padx=5, pady=8)
-
-        ctk.CTkButton(grid_frame, text="Historial", image=icon("inventario_historial_lotes"), compound="left",
-                      fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),
-                      width=btn_width, height=btn_height, corner_radius=8,
-                      command=controller.show_historial).grid(row=1, column=1, padx=5, pady=8)
-
-        ctk.CTkButton(grid_frame, text="Categorias", image=icon("categorias"), compound="left",
-                      fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),
-                      width=btn_width, height=btn_height, corner_radius=8,
-                      command=controller.show_categorias).grid(row=1, column=2, padx=5, pady=8)
-
-        if controller.verificar_permiso("respaldos"):
-            ctk.CTkButton(grid_frame, text="Respaldo BD", image=icon("inventario_registrar"), compound="left",
+        fila = 0
+        columna = 0
+        for permiso, texto, nombre_icono, comando in modulos:
+            if not controller.verificar_permiso(permiso):
+                continue
+            ctk.CTkButton(grid_frame, text=texto, image=icon(nombre_icono), compound="left",
                           fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),
                           width=btn_width, height=btn_height, corner_radius=8,
-                          command=self.abrir_modal_respaldo).grid(row=2, column=1, padx=5, pady=8)
-
-        ctk.CTkButton(grid_frame, text="Reportes", image=icon("ventas_ver_ventas"), compound="left",
-                      fg_color="#5CB85C", text_color="#000000", font=("Arial", 13, "bold"),
-                      width=btn_width, height=btn_height, corner_radius=8,
-                      command=controller.show_reportes).grid(row=2, column=0, padx=5, pady=8)
+                          command=comando).grid(row=fila, column=columna, padx=5, pady=8)
+            columna += 1
+            if columna == 3:
+                columna = 0
+                fila += 1
 
         cerrar_frame = ctk.CTkFrame(container, fg_color="#3B3B3B")
         cerrar_frame.pack(fill="x", pady=(10, 20))
