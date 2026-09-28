@@ -46,8 +46,8 @@ class LoginView:
         ctk.CTkLabel(form_frame, text="Inicio de sesion", text_color="#FFFFFF", font=("Arial", 20)).pack(pady=(0, 25))
 
         ctk.CTkLabel(form_frame, text="Nombre de usuario", text_color="#FFFFFF", font=("Arial", 11)).pack(anchor="w")
-        self.entry_user = ctk.CTkEntry(form_frame, font=("Arial", 12), width=230)
-        self.entry_user.pack(pady=(5, 15))
+        self.entry_user = ctk.CTkEntry(form_frame, font=("Arial", 12), width=235)
+        self.entry_user.pack(pady=(5, 15), anchor="w")
 
         ctk.CTkLabel(form_frame, text="Contrasena", text_color="#FFFFFF", font=("Arial", 11)).pack(anchor="w")
 
